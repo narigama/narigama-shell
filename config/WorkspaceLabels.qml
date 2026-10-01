@@ -41,14 +41,10 @@ Singleton {
         return (tens > 1 ? japaneseDigits[tens] : "") + "十" + japaneseDigits[ones];
     }
 
-    function label(workspace) {
-        const name = workspace.name.replace(/^special:/, "");
-
-        // Special and named workspaces keep their names.
-        if (workspace.id <= 0 || String(workspace.id) !== workspace.name)
+    // `id` is the workspace number, or 0 for named/special workspaces, which keep `name`.
+    function label(id, name) {
+        if (id <= 0)
             return name;
-
-        const id = workspace.id;
 
         switch (ShellState.workspaceLabels) {
         case "arabic":

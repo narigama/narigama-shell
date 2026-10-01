@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
-import Quickshell.Hyprland
 import Quickshell.Wayland
 import qs.components
 import qs.config
@@ -13,7 +12,7 @@ PanelWindow {
     id: root
 
     required property ShellScreen targetScreen
-    readonly property bool active: Osd.shown && Hyprland.focusedMonitor?.name === targetScreen.name
+    readonly property bool active: Osd.shown && Compositor.focusedScreen()?.name === targetScreen.name
     readonly property int bottomGap: 64
 
     screen: targetScreen

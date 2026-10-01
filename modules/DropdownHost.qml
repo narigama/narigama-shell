@@ -64,7 +64,8 @@ PanelWindow {
     }
 
     WlrLayershell.namespace: "narigama-dropdown"
-    WlrLayershell.layer: WlrLayer.Top
+    // Above the outside-click catcher (Top) where that's in use.
+    WlrLayershell.layer: Compositor.hasFocusGrab ? WlrLayer.Top : WlrLayer.Overlay
     WlrLayershell.keyboardFocus: open ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
 
     onOpenChanged: {
@@ -180,10 +181,47 @@ PanelWindow {
         }
     }
 
-    HyprlandFocusGrab {
-        active: host.open
-        windows: [host, host.bar]
-        onCleared: Dropdowns.close()
+    // Clicking outside closes the dropdown. Hyprland's focus grab does this cleanly; elsewhere an
+    // invisible layer under the bar takes input while any dropdown is open (that click is consumed).
+    LazyLoader {
+        active: Compositor.hasFocusGrab
+
+        HyprlandFocusGrab {
+            active: host.open
+            windows: [host, host.bar]
+            onCleared: Dropdowns.close()
+        }
+    }
+
+    LazyLoader {
+        active: !Compositor.hasFocusGrab
+
+        PanelWindow {
+            screen: host.targetScreen
+            anchors {
+                top: true
+                bottom: true
+                left: true
+                right: true
+            }
+            color: "transparent"
+            exclusionMode: ExclusionMode.Normal
+            exclusiveZone: 0
+            mask: Region {
+                item: Dropdowns.current !== "" ? catcher : null
+            }
+
+            WlrLayershell.namespace: "narigama-dropdown-catcher"
+            WlrLayershell.layer: WlrLayer.Top
+
+            MouseArea {
+                id: catcher
+
+                anchors.fill: parent
+                acceptedButtons: Qt.AllButtons
+                onPressed: Dropdowns.close()
+            }
+        }
     }
 
     Component {

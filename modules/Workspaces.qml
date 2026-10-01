@@ -1,6 +1,5 @@
 import QtQuick
 import Quickshell
-import Quickshell.Hyprland
 import qs.config
 import qs.services
 
@@ -9,7 +8,6 @@ Item {
     id: root
 
     required property ShellScreen screen
-    readonly property HyprlandMonitor monitor: Hyprland.monitorFor(screen)
     property Item activeItem: null
 
     implicitWidth: row.implicitWidth
@@ -47,18 +45,16 @@ Item {
         Repeater {
             // Diffed, so existing buttons keep their position for the highlight to slide from.
             model: ScriptModel {
-                values: Hyprland.workspaces.values.filter(w => w.monitor === root.monitor).sort((a, b) => a.id - b.id)
+                values: Compositor.workspacesFor(root.screen)
             }
 
             delegate: Item {
                 id: workspace
 
-                required property HyprlandWorkspace modelData
-                readonly property bool active: modelData.active
-                readonly property bool occupied: modelData.toplevels.values.length > 0
-                // Hyprland marks a workspace urgent when a window asks for attention (bell,
-                // xdg-activation); it clears once the workspace is visited.
-                readonly property bool urgent: modelData.urgent && !active
+                required property var modelData
+                readonly property bool active: Compositor.isActive(modelData)
+                readonly property bool occupied: Compositor.isOccupied(modelData)
+                readonly property bool urgent: Compositor.isUrgent(modelData) && !active
 
                 implicitWidth: Math.max(Theme.workspaceMinWidth, label.implicitWidth + 2 * Theme.workspacePadding)
                 implicitHeight: Theme.barHeight
@@ -109,7 +105,7 @@ Item {
                     id: label
 
                     anchors.centerIn: parent
-                    text: WorkspaceLabels.label(workspace.modelData)
+                    text: WorkspaceLabels.label(Compositor.number(workspace.modelData), Compositor.name(workspace.modelData))
                     color: workspace.active || workspace.urgent ? Theme.surface : workspace.occupied ? Theme.fgMuted : Theme.fgSubtle
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSize
@@ -130,7 +126,7 @@ Item {
                         if (mouse.button === Qt.RightButton)
                             Dropdowns.toggle("workspaces", root, root.screen);
                         else
-                            workspace.modelData.activate();
+                            Compositor.activate(workspace.modelData);
                     }
                 }
             }

@@ -3,7 +3,6 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Bluetooth
-import Quickshell.Hyprland
 import Quickshell.Io
 import Quickshell.Networking
 import Quickshell.Services.Pipewire
@@ -166,16 +165,11 @@ Singleton {
         lastNetwork = networkName;
     }
 
-    // Hyprland reports "activelayout>>keyboard,layout" per keyboard, so repeat layouts are dropped.
+    // Compositors report the layout once per keyboard, so repeats are dropped.
     Connections {
-        target: Hyprland
+        target: Compositor
 
-        function onRawEvent(event) {
-            if (event.name !== "activelayout")
-                return;
-
-            const layout = event.data.split(",").slice(1).join(",");
-
+        function onKeyboardLayoutChanged(layout) {
             if (layout === root.lastLayout)
                 return;
 
@@ -204,8 +198,10 @@ Singleton {
     IpcHandler {
         target: "osd"
 
+        // Only Hyprland exposes the caps lock state (via hyprctl).
         function capsLock(): void {
-            capsQuery.running = true;
+            if (Compositor.hasCapsLock)
+                capsQuery.running = true;
         }
 
         function message(text: string): void {

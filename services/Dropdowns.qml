@@ -2,7 +2,6 @@ pragma Singleton
 
 import QtQuick
 import Quickshell
-import Quickshell.Hyprland
 import Quickshell.Io
 
 // Which dropdown is open, on which screen, and where on the bar it hangs from.
@@ -45,7 +44,7 @@ Singleton {
         target: "dropdown"
 
         function toggle(name: string): string {
-            return toggleOn(name, Hyprland.focusedMonitor?.name ?? "");
+            return toggleOn(name, Compositor.focusedScreen()?.name ?? "");
         }
 
         function toggleOn(name: string, screenName: string): string {

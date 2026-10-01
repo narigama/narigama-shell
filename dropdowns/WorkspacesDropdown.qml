@@ -1,28 +1,26 @@
 import QtQuick
 import QtQuick.Layouts
-import Quickshell.Hyprland
 import qs.components
 import qs.config
+import qs.services
 
 ColumnLayout {
     id: root
 
-    readonly property var workspaces: Hyprland.workspaces.values.slice().sort((a, b) => a.id - b.id)
-
     width: 380
     spacing: 4
 
-    // Toplevel classes come from IPC and are only fetched on request.
-    Component.onCompleted: Hyprland.refreshToplevels()
+    Component.onCompleted: Compositor.refreshWindows()
 
     Repeater {
-        model: root.workspaces
+        model: Compositor.workspaces
 
         delegate: ColumnLayout {
             id: workspaceItem
 
-            required property HyprlandWorkspace modelData
+            required property var modelData
             required property int index
+            readonly property var windows: Compositor.windowsFor(modelData)
 
             Layout.fillWidth: true
             Layout.topMargin: index === 0 ? 0 : 8
@@ -30,24 +28,24 @@ ColumnLayout {
 
             ListRow {
                 icon: Icons.monitor
-                iconColor: workspaceItem.modelData.active ? Theme.primary : Theme.fgMuted
-                title: "Workspace " + WorkspaceLabels.label(workspaceItem.modelData)
-                subtitle: (workspaceItem.modelData.monitor?.name ?? "") + " · " + workspaceItem.modelData.toplevels.values.length + " windows"
-                highlighted: workspaceItem.modelData.focused
-                onClicked: workspaceItem.modelData.activate()
+                iconColor: Compositor.isActive(workspaceItem.modelData) ? Theme.primary : Theme.fgMuted
+                title: "Workspace " + WorkspaceLabels.label(Compositor.number(workspaceItem.modelData), Compositor.name(workspaceItem.modelData))
+                subtitle: Compositor.screenName(workspaceItem.modelData) + (Compositor.hasWindowLists ? " · " + workspaceItem.windows.length + " windows" : "")
+                highlighted: Compositor.isFocused(workspaceItem.modelData)
+                onClicked: Compositor.activate(workspaceItem.modelData)
             }
 
             Repeater {
-                model: workspaceItem.modelData.toplevels.values
+                model: workspaceItem.windows
 
                 delegate: ListRow {
-                    required property HyprlandToplevel modelData
+                    required property var modelData
 
                     Layout.leftMargin: 24
-                    title: modelData.title || "Untitled"
-                    subtitle: modelData.lastIpcObject?.class ?? ""
-                    highlighted: modelData.activated
-                    onClicked: Hyprland.dispatch("focuswindow address:0x" + modelData.address.replace(/^0x/, ""))
+                    title: modelData.title
+                    subtitle: modelData.subtitle
+                    highlighted: modelData.focused
+                    onClicked: modelData.focus()
                 }
             }
         }
