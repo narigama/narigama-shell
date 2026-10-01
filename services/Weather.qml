@@ -86,6 +86,11 @@ Singleton {
     }
 
     function refresh() {
+        if (ShellState.weatherLocation === "") {
+            root.error = "";
+            return;
+        }
+
         if (isNaN(latitude)) {
             getJson("https://geocoding-api.open-meteo.com/v1/search?count=1&name=" + encodeURIComponent(ShellState.weatherLocation), data => {
                 const place = data.results?.[0];

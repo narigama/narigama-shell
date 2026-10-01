@@ -76,7 +76,7 @@ ColumnLayout {
         spacing: 16
 
         StyledText {
-            text: Icons.archlinux
+            text: Icons.forDistro(Tools.distroId)
             font.family: Theme.iconFontFamily
             color: Theme.yellow
             font.pixelSize: 44
@@ -112,47 +112,20 @@ ColumnLayout {
 
         IconButton {
             Layout.fillWidth: true
-            icon: Icons.lock
-            text: "Lock"
-            background: Theme.surface
-            onClicked: root.run("lock", Config.lockCommand, false)
-        }
-
-        IconButton {
-            Layout.fillWidth: true
-            icon: Icons.logout
-            text: root.pending === "logout" ? "Confirm?" : "Log out"
-            foreground: Theme.yellow
-            background: Theme.surface
-            onClicked: root.run("logout", Config.logoutCommand, true)
-        }
-
-        IconButton {
-            Layout.fillWidth: true
-            icon: Icons.restart
-            text: root.pending === "reboot" ? "Confirm?" : "Reboot"
-            foreground: Theme.yellow
-            background: Theme.surface
-            onClicked: root.run("reboot", Config.rebootCommand, true)
-        }
-
-        IconButton {
-            Layout.fillWidth: true
-            icon: Icons.power
-            text: root.pending === "poweroff" ? "Confirm?" : "Power off"
-            foreground: Theme.red
-            background: Theme.surface
-            onClicked: root.run("poweroff", Config.poweroffCommand, true)
-        }
-
-        IconButton {
-            Layout.fillWidth: true
-            Layout.columnSpan: 2
             icon: Icons.cog
             text: "Settings"
             foreground: Theme.primary
             background: Theme.surface
             onClicked: Dropdowns.current = "settings"
+        }
+
+        IconButton {
+            Layout.fillWidth: true
+            icon: Icons.image
+            text: "Wallpapers"
+            foreground: Theme.primary
+            background: Theme.surface
+            onClicked: Dropdowns.current = "wallpapers"
         }
     }
 
@@ -230,5 +203,49 @@ ColumnLayout {
         visible: root.trayMenuItem !== null && root.trayItems.includes(root.trayMenuItem)
         menu: visible ? root.trayMenuItem.menu : null
         onActivated: Dropdowns.close()
+    }
+
+    // Kept at the bottom, away from the page buttons, so they aren't hit by accident.
+    GridLayout {
+        Layout.fillWidth: true
+        Layout.topMargin: 8
+        columns: 2
+        rowSpacing: 4
+        columnSpacing: 4
+
+        IconButton {
+            Layout.fillWidth: true
+            icon: Icons.lock
+            text: "Lock"
+            background: Theme.surface
+            onClicked: root.run("lock", Config.lockCommand, false)
+        }
+
+        IconButton {
+            Layout.fillWidth: true
+            icon: Icons.logout
+            text: root.pending === "logout" ? "Confirm?" : "Log out"
+            foreground: Theme.yellow
+            background: Theme.surface
+            onClicked: root.run("logout", Config.logoutCommand, true)
+        }
+
+        IconButton {
+            Layout.fillWidth: true
+            icon: Icons.restart
+            text: root.pending === "reboot" ? "Confirm?" : "Reboot"
+            foreground: Theme.yellow
+            background: Theme.surface
+            onClicked: root.run("reboot", Config.rebootCommand, true)
+        }
+
+        IconButton {
+            Layout.fillWidth: true
+            icon: Icons.power
+            text: root.pending === "poweroff" ? "Confirm?" : "Power off"
+            foreground: Theme.red
+            background: Theme.surface
+            onClicked: root.run("poweroff", Config.poweroffCommand, true)
+        }
     }
 }

@@ -11,6 +11,47 @@ Singleton {
     readonly property string cpu: glyph(0xf4bc)
     readonly property string memory: glyph(0xefc5)
     readonly property string archlinux: glyph(0xf303)
+    readonly property string tux: glyph(0xf31a)
+
+    // os-release ID -> nf-linux-* logo.
+    readonly property var distroLogos: ({
+            "almalinux": glyph(0xf31d),
+            "alpine": glyph(0xf300),
+            "arch": glyph(0xf303),
+            "archcraft": glyph(0xf345),
+            "arcolinux": glyph(0xf346),
+            "artix": glyph(0xf31f),
+            "cachyos": glyph(0xf385),
+            "centos": glyph(0xf304),
+            "debian": glyph(0xf306),
+            "deepin": glyph(0xf321),
+            "devuan": glyph(0xf307),
+            "elementary": glyph(0xf309),
+            "endeavouros": glyph(0xf322),
+            "fedora": glyph(0xf30a),
+            "garuda": glyph(0xf337),
+            "gentoo": glyph(0xf30d),
+            "kali": glyph(0xf327),
+            "linuxmint": glyph(0xf30e),
+            "manjaro": glyph(0xf312),
+            "neon": glyph(0xf331),
+            "nixos": glyph(0xf313),
+            "nobara": glyph(0xf380),
+            "opensuse-leap": glyph(0xf37e),
+            "opensuse-tumbleweed": glyph(0xf37d),
+            "pop": glyph(0xf32a),
+            "rhel": glyph(0xf316),
+            "rocky": glyph(0xf32b),
+            "slackware": glyph(0xf318),
+            "solus": glyph(0xf32d),
+            "ubuntu": glyph(0xf31b),
+            "void": glyph(0xf32e),
+            "zorin": glyph(0xf32f)
+        })
+
+    function forDistro(id) {
+        return distroLogos[id] ?? (id.startsWith("opensuse") ? glyph(0xf314) : tux);
+    }
 
     readonly property var volumeLevels: [glyph(0xf057f), glyph(0xf0580), glyph(0xf057e)]
     readonly property string volumeHigh: volumeLevels[2]
@@ -54,6 +95,25 @@ Singleton {
     readonly property string deleteSweep: glyph(0xf0c62)
     readonly property string monitor: glyph(0xf0379)
     readonly property string cog: glyph(0xf0493)
+    readonly property string dragHandle: glyph(0xf01dd)
+    readonly property string harddisk: glyph(0xf02ca)
+    readonly property string packageUp: glyph(0xf03d5)
+    readonly property string alertCircle: glyph(0xf05d6)
+    readonly property string screenshot: glyph(0xf0e51)
+    readonly property string crop: glyph(0xf019e)
+    readonly property string video: glyph(0xf0567)
+    readonly property string record: glyph(0xf044a)
+    readonly property string stop: glyph(0xf04db)
+    readonly property string clipboard: glyph(0xf0a38)
+    readonly property string image: glyph(0xf0976)
+    readonly property string deleteOutline: glyph(0xf09e7)
+    readonly property string folder: glyph(0xf0256)
+    readonly property string eyedropper: glyph(0xf020a)
+    readonly property string brightness: glyph(0xf00df)
+    readonly property string coffee: glyph(0xf0176)
+    readonly property string coffeeOutline: glyph(0xf06ca)
+    readonly property string gamepad: glyph(0xf0297)
+    readonly property string terminal: glyph(0xf018d)
 
     readonly property string play: glyph(0xf040a)
     readonly property string pause: glyph(0xf03e4)

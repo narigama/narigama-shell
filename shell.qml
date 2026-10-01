@@ -21,7 +21,7 @@ ShellRoot {
 
             DropdownHost {
                 targetScreen: perScreen.modelData
-                bar: bar
+                barScope: bar
             }
 
             OsdWindow {

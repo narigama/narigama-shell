@@ -49,6 +49,7 @@ Item {
         anchors.fill: parent
         enabled: root.enabled
         cursorShape: Qt.PointingHandCursor
+        preventStealing: true
         onPressed: mouse => update(mouse.x)
         onPositionChanged: mouse => update(mouse.x)
         onWheel: wheel => root.moved(Math.max(0, Math.min(1, root.value + (wheel.angleDelta.y > 0 ? 0.05 : -0.05))))

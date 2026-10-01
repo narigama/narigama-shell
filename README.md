@@ -4,7 +4,7 @@ A [Quickshell](https://quickshell.org) status bar and desktop shell for Wayland 
 
 ## Features
 
-- Bar with workspaces, media, privacy indicator, weather, clock, volume, CPU, RAM, notifications, network, bluetooth and a system menu. Every module can be hidden from settings.
+- Bar at the top or bottom of the screen with workspaces, media, privacy indicator, weather, clock, volume, CPU, RAM, disk usage, package updates, failed systemd units, notifications, clipboard history, screenshot and recording, colour picker, monitor brightness, idle inhibitor, gamemode, network, bluetooth and a system menu. Modules can be hidden, reordered and moved between the left, centre and right groups by dragging them in settings.
 - A dropdown for each module that slides down from the bar:
   - calendar
   - hourly and 5-day weather (Open-Meteo)
@@ -12,25 +12,47 @@ A [Quickshell](https://quickshell.org) status bar and desktop shell for Wayland 
   - audio devices and per-app volume
   - wifi and bluetooth management
   - CPU, RAM, GPU and network stats with history graphs
+  - disk usage per mount
+  - pending updates, with a button to run the upgrade in a terminal
+  - failed systemd units, opening their status and log in a terminal
+  - screenshots (region or screen, optionally annotated in satty) and screen recording
+  - clipboard history with search
+  - recently picked colours
+  - DDC/CI brightness per external monitor
   - workspaces (and their windows, on Hyprland)
   - system tray
   - power actions
-  - settings
-- Notification daemon with popups, history grouped by app, per-app muting and do-not-disturb.
+- Notification daemon with popups (top or bottom, left, centre or right), history grouped by app, per-app muting and do-not-disturb.
 - On-screen display for volume, mic, device switches, bluetooth, network, keyboard layout and caps lock (see [Compositor support](#compositor-support) for what each compositor provides).
 - Privacy indicator for apps using the microphone, camera or screen share.
 - Workspace tabs that pulse when a window asks for attention.
-- 15 themes (10 dark, 5 light), font pickers, and numeric, Arabic, Roman, Japanese or custom workspace labels.
+- A full-width tray the bar slides away from its edge to reveal, with tabs for settings and wallpapers. The wallpaper carousel pans with the pointer, applies to all monitors or chosen ones (awww, or swaybg as a fallback), and can derive the shell's colours from the wallpaper with matugen.
+- 20 themes (10 dark, 10 light), font pickers, and numeric, Arabic, Roman, Japanese or custom workspace labels.
 
 ## Requirements
 
 - A compositor with wlr-layer-shell (see [Compositor support](#compositor-support))
 - Quickshell 0.3.1 or newer
-- A [Nerd Font](https://www.nerdfonts.com) for icons (default: IosevkaTermSlab Nerd Font)
+- A [Nerd Font](https://www.nerdfonts.com) for icons (default: IosevkaTermSlab Nerd Font; if it isn't installed, the first installed Nerd Font is used)
 - PipeWire and NetworkManager (for audio, privacy and network)
 - BlueZ (for bluetooth)
 - `nvidia-smi` for NVIDIA GPU stats (optional; AMD GPUs are read from sysfs)
 - Noto Sans Arabic / Noto Sans CJK for the Arabic and Japanese workspace labels (optional)
+
+Some modules need extra tools. Disk usage is on by default; the rest of these start hidden and can be switched on in settings. A module whose tools are missing is hidden from the bar, and its row in settings says which packages to install:
+
+| Module | Needs |
+| --- | --- |
+| Package updates | pacman (plus `fakeroot`), apt or dnf; `paru` or `yay` adds AUR updates |
+| Failed units | systemd |
+| Screenshot and recording | `grim`, `slurp`, `wl-clipboard`; `wf-recorder` for recording, `satty` for annotation |
+| Clipboard history | `cliphist`, `wl-clipboard`, and `wl-paste --watch cliphist store` running from your compositor's autostart |
+| Colour picker | `hyprpicker`, `wl-clipboard` (Hyprland only) |
+| Monitor brightness | `ddcutil`, with access to `/dev/i2c-*` (usually the `i2c` group) |
+| Gamemode | `gamemode` |
+| Wallpapers | `awww` (or `swaybg`), and `libvips` (or ImageMagick) for thumbnails; `matugen` to match colours |
+
+Update checks: on Arch the sync databases are copied and refreshed privately with fakeroot (like `checkupdates`), so the system databases are never touched; on Debian/Ubuntu the list comes from the last `apt update`; on Fedora `dnf check-update` refreshes its own cache. The terminal for upgrades and unit logs comes from `$TERMINAL`, then `xdg-terminal-exec`, then the first of foot, kitty, alacritty, wezterm, ghostty, gnome-terminal and konsole that is installed; set `terminalCommand` in `config/Config.qml` to override it. Screenshots and recordings go to `Screenshots` and `Recordings` in your XDG Pictures and Videos folders, and wallpapers default to `Wallpapers` in Pictures. Weather stays hidden until a city is set in settings.
 
 The shell becomes the notification daemon, so stop any other daemon (mako, dunst, swaync) before running it.
 
@@ -60,7 +82,7 @@ Or link it into `~/.config/quickshell/narigama-shell` and run `qs -c narigama-sh
 
 ## Settings
 
-Most options live in the settings page, opened from the system menu (Arch icon, then Settings). They are saved to `~/.local/state/quickshell/by-shell/<id>/state.json`. Notification history is kept alongside in `notifications.json`.
+Most options live in the settings tray, opened from the system menu (your distro's logo, then Settings) or with `ipc call dropdown toggle settings`; Escape, the close button or clicking elsewhere closes it. They are saved to `~/.local/state/quickshell/by-shell/<id>/state.json`. Notification history is kept alongside in `notifications.json`.
 
 Fixed behaviour (commands for lock, logout, reboot and power off, refresh intervals, history size) is in `config/Config.qml`.
 
@@ -78,7 +100,7 @@ Everything below works with `qs -p <dir> ipc call ...` (or `qs -c <name> ipc cal
 | `theme set <id>` / `theme list` | Switch theme / list theme ids |
 | `settings get <key>` / `settings set <key> <json>` | Read or change any setting |
 
-Dropdown names: `calendar`, `weather`, `media`, `audio`, `network`, `bluetooth`, `notifications`, `dashboard`, `settings`, `cpu`, `ram`, `workspaces`, `privacy`.
+Dropdown names: `calendar`, `weather`, `media`, `audio`, `network`, `bluetooth`, `notifications`, `dashboard`, `cpu`, `ram`, `workspaces`, `privacy`, `disk`, `updates`, `failedUnits`, `capture`, `clipboard`, `colors`, `brightness`. The tray tabs open the same way: `settings`, `wallpapers`.
 
 The `qs` CLI swallows arguments that start with `[`, so prefix JSON arrays with a space: `settings set mutedApps ' ["Slack"]'`.
 

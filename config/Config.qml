@@ -15,4 +15,9 @@ Singleton {
     readonly property string logoutCommand: "loginctl terminate-session $XDG_SESSION_ID"
     readonly property string rebootCommand: "systemctl reboot"
     readonly property string poweroffCommand: "systemctl poweroff"
+
+    // Prefix for commands run in a terminal window (updates, unit status), e.g. ["foot"].
+    // Empty means auto-detect (see Tools.terminalCommand).
+    readonly property var terminalCommand: []
+    readonly property int updatesRefreshMs: 60 * 60 * 1000
 }

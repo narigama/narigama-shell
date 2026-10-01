@@ -22,6 +22,8 @@ Singleton {
     readonly property int count: history.length
     readonly property bool dnd: ShellState.notificationsDnd
 
+    readonly property int duplicateWindowMs: 2000
+
     // Live Notification objects by entry key, for actions and dismissal while the sender still cares.
     // Keys rather than notification ids, since ids restart with the daemon but history persists.
     property var live: ({})
@@ -183,11 +185,21 @@ Singleton {
         persistenceSupported: true
 
         onNotification: notification => {
-            const key = notification.id + ":" + Date.now();
-
             notification.tracked = true;
+
+            // Some apps (Slack) send each message twice in quick succession under different ids;
+            // fold the repeat into the first entry, keeping the newer object for actions.
+            const duplicate = root.history.find(e => Date.now() - e.time < root.duplicateWindowMs && e.appName === notification.appName && e.summary === notification.summary && e.body === notification.body);
+            const key = duplicate?.key ?? notification.id + ":" + Date.now();
+
             root.live[key] = notification;
-            notification.closed.connect(() => delete root.live[key]);
+            notification.closed.connect(() => {
+                if (root.live[key] === notification)
+                    delete root.live[key];
+            });
+
+            if (duplicate)
+                return;
 
             const item = {
                 "key": key,

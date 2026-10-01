@@ -7,7 +7,6 @@ import qs.services
 BarButton {
     readonly property var current: Weather.current
 
-    visible: current !== null && ShellState.moduleVisible("weather")
     icon: current ? Weather.icon(current.weather_code, current.is_day) : ""
     label: current ? Math.round(current.temperature_2m) + "°" : ""
     color: Theme.yellow

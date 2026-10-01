@@ -7,21 +7,29 @@ import qs.config
 import qs.dropdowns
 import qs.services
 
-// Per-screen window that slides the open dropdown down from under the bar.
+// Per-screen window that slides the open dropdown out of the bar's edge (down from a top bar,
+// up from a bottom one).
 // The surface stays mapped at a fixed size with input masked to the panel: mapping or
 // resizing a layer lets the compositor fade/animate it, which should be a pure slide.
 PanelWindow {
     id: host
 
-    required property PanelWindow bar
+    // The screen's bar (modules/Bar.qml): its current window joins the focus grab, and its
+    // settings tray is kept clear of the outside-click catcher.
+    required property var barScope
+    readonly property PanelWindow bar: barScope.window
     // Compared against instead of `screen`, which the window itself rewrites when mapped.
     required property ShellScreen targetScreen
-    readonly property bool open: Dropdowns.current !== "" && Dropdowns.screen === targetScreen
+    // Settings and wallpapers open as the bar's tray rather than a dropdown.
+    readonly property bool open: Dropdowns.current !== "" && !barScope.trayTabs.some(t => t[0] === Dropdowns.current) && Dropdowns.screen === targetScreen
     // Lags `Dropdowns.current` so content stays loaded while sliding closed.
     property string shown: ""
     property bool closing: false
     // Fully open and not sliding: size/position changes (switching dropdowns, live content) animate.
-    readonly property bool settled: open && !closing && panel.y === 0
+    // Tracked by time rather than position: on a bottom bar the open position moves with the height.
+    property bool slidIn: false
+    readonly property bool settled: open && !closing && slidIn
+    readonly property bool atBottom: ShellState.barAtBottom
     readonly property int padding: 16
     readonly property int gutter: 8
     readonly property int maxContentHeight: Math.round(targetScreen.height * 0.8)
@@ -45,13 +53,20 @@ PanelWindow {
             "cpu": cpu,
             "ram": ram,
             "workspaces": workspaces,
-            "settings": settings,
-            "privacy": privacy
+            "privacy": privacy,
+            "disk": diskDropdown,
+            "updates": updatesDropdown,
+            "failedUnits": failedUnitsDropdown,
+            "capture": captureDropdown,
+            "clipboard": clipboardDropdown,
+            "colors": colorsDropdown,
+            "brightness": brightnessDropdown
         })
 
     screen: targetScreen
     anchors {
-        top: true
+        top: !host.atBottom
+        bottom: host.atBottom
         left: true
         right: true
     }
@@ -69,14 +84,17 @@ PanelWindow {
     WlrLayershell.keyboardFocus: open ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
 
     onOpenChanged: {
+        slidIn = false;
+
         if (open) {
             closing = false;
             shown = Dropdowns.current;
+            slideTimer.restart();
             return;
         }
 
         // Already fully hidden (closed before the slide moved), so no y change will finish the close.
-        closing = panel.y > -panel.height;
+        closing = panel.y !== panel.hiddenY;
 
         if (!closing)
             shown = "";
@@ -91,14 +109,24 @@ PanelWindow {
         }
     }
 
+    Timer {
+        id: slideTimer
+
+        interval: 200
+        onTriggered: host.slidIn = host.open
+    }
+
     Item {
         anchors.fill: parent
 
         Rectangle {
             id: panel
 
+            readonly property real openY: host.atBottom ? host.height - height : 0
+            readonly property real hiddenY: host.atBottom ? host.height : -height
+
             x: Math.round(Math.max(host.gutter, Math.min(host.width - width - host.gutter, Dropdowns.anchorX - width / 2)))
-            y: host.open ? 0 : -height
+            y: host.open ? openY : hiddenY
             // Dropdowns set an explicit width; their height follows content up to maxContentHeight.
             width: flick.width + 2 * host.padding
             height: flick.height + 2 * host.padding
@@ -110,13 +138,16 @@ PanelWindow {
             Keys.onEscapePressed: Dropdowns.close()
 
             onYChanged: {
-                if (!host.open && y <= -height) {
+                if (!host.open && y === hiddenY) {
                     host.closing = false;
                     host.shown = "";
                 }
             }
 
+            // Only the open/close slide animates y; once settled, y tracks the (animated) height.
             Behavior on y {
+                enabled: !host.settled
+
                 NumberAnimation {
                     duration: 180
                     easing.type: Easing.OutCubic
@@ -187,7 +218,7 @@ PanelWindow {
         active: Compositor.hasFocusGrab
 
         HyprlandFocusGrab {
-            active: host.open
+            active: host.open || host.barScope.trayOpen
             windows: [host, host.bar]
             onCleared: Dropdowns.close()
         }
@@ -209,6 +240,14 @@ PanelWindow {
             exclusiveZone: 0
             mask: Region {
                 item: Dropdowns.current !== "" ? catcher : null
+
+                // The open settings tray overlaps this window; leave it clickable.
+                Region {
+                    y: ShellState.barAtBottom ? catcher.height - host.barScope.trayShown : 0
+                    width: catcher.width
+                    height: host.barScope.trayShown
+                    intersection: Intersection.Subtract
+                }
             }
 
             WlrLayershell.namespace: "narigama-dropdown-catcher"
@@ -297,8 +336,44 @@ PanelWindow {
     }
 
     Component {
-        id: settings
+        id: diskDropdown
 
-        SettingsDropdown {}
+        DiskDropdown {}
+    }
+
+    Component {
+        id: updatesDropdown
+
+        UpdatesDropdown {}
+    }
+
+    Component {
+        id: failedUnitsDropdown
+
+        FailedUnitsDropdown {}
+    }
+
+    Component {
+        id: captureDropdown
+
+        CaptureDropdown {}
+    }
+
+    Component {
+        id: clipboardDropdown
+
+        ClipboardDropdown {}
+    }
+
+    Component {
+        id: colorsDropdown
+
+        ColorsDropdown {}
+    }
+
+    Component {
+        id: brightnessDropdown
+
+        BrightnessDropdown {}
     }
 }

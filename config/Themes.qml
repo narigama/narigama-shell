@@ -277,6 +277,96 @@ Singleton {
                 "green": "#396847",
                 "blue": "#287980"
             }
+        },
+        {
+            "id": "rose-pine-dawn",
+            "name": "Rosé Pine Dawn",
+            "light": true,
+            "colors": {
+                "bg": "#f2e9e1",
+                "surface": "#faf4ed",
+                "elevated": "#dfdad9",
+                "fg": "#575279",
+                "fgMuted": "#797593",
+                "fgSubtle": "#9893a5",
+                "primary": "#907aa9",
+                "red": "#b4637a",
+                "yellow": "#ea9d34",
+                "green": "#286983",
+                "blue": "#56949f"
+            }
+        },
+        {
+            "id": "everforest-light",
+            "name": "Everforest Light",
+            "light": true,
+            "colors": {
+                "bg": "#efebd4",
+                "surface": "#fdf6e3",
+                "elevated": "#e6e2cc",
+                "fg": "#5c6a72",
+                "fgMuted": "#829181",
+                "fgSubtle": "#a6b0a0",
+                "primary": "#35a77c",
+                "red": "#f85552",
+                "yellow": "#dfa000",
+                "green": "#8da101",
+                "blue": "#3a94c5"
+            }
+        },
+        {
+            "id": "one-light",
+            "name": "One Light",
+            "light": true,
+            "colors": {
+                "bg": "#f0f0f1",
+                "surface": "#fafafa",
+                "elevated": "#e5e5e6",
+                "fg": "#383a42",
+                "fgMuted": "#696c77",
+                "fgSubtle": "#a0a1a7",
+                "primary": "#4078f2",
+                "red": "#e45649",
+                "yellow": "#c18401",
+                "green": "#50a14f",
+                "blue": "#0184bc"
+            }
+        },
+        {
+            "id": "github-light",
+            "name": "GitHub Light",
+            "light": true,
+            "colors": {
+                "bg": "#f6f8fa",
+                "surface": "#ffffff",
+                "elevated": "#d0d7de",
+                "fg": "#1f2328",
+                "fgMuted": "#656d76",
+                "fgSubtle": "#8c959f",
+                "primary": "#8250df",
+                "red": "#cf222e",
+                "yellow": "#9a6700",
+                "green": "#1a7f37",
+                "blue": "#0969da"
+            }
+        },
+        {
+            "id": "kanagawa-lotus",
+            "name": "Kanagawa Lotus",
+            "light": true,
+            "colors": {
+                "bg": "#e5ddb0",
+                "surface": "#f2ecbc",
+                "elevated": "#dcd5ac",
+                "fg": "#545464",
+                "fgMuted": "#716e61",
+                "fgSubtle": "#8a8980",
+                "primary": "#624c83",
+                "red": "#c84053",
+                "yellow": "#cc6d00",
+                "green": "#6f894e",
+                "blue": "#4d699b"
+            }
         }
     ]
 

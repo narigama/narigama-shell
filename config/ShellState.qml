@@ -8,21 +8,23 @@ import Quickshell.Io
 Singleton {
     id: root
 
-    readonly property var keys: ["notificationsDnd", "theme", "fontFamily", "iconFontFamily", "fontSize", "iconSize", "hiddenModules", "clockSeconds", "clock24h", "weatherLocation", "popupSeconds", "popupMax", "osdEnabled", "workspaceLabels", "workspaceCustomLabels", "mutedApps"]
+    readonly property var keys: ["notificationsDnd", "theme", "fontFamily", "iconFontFamily", "fontSize", "iconSize", "hiddenModules", "clockSeconds", "clock24h", "weatherLocation", "popupSeconds", "popupMax", "osdEnabled", "workspaceLabels", "workspaceCustomLabels", "mutedApps", "barPosition", "popupPosition", "barLayout", "captureAnnotate", "captureAudio", "wallpaper", "wallpaperDir", "matchWallpaper", "wallpaperThemeMode", "wallpaperColors"]
 
     property bool notificationsDnd: false
 
     property string theme: "nightfox"
     property string fontFamily: "IosevkaTermSlab Nerd Font"
-    // Must contain the Nerd Font glyphs; services/Fonts.qml lists the installed candidates.
+    // Must contain the Nerd Font glyphs; config/Fonts.qml lists the installed candidates; Theme falls back if it is missing.
     property string iconFontFamily: "IosevkaTermSlab Nerd Font"
     property int fontSize: 15
     property int iconSize: 24
     // Bar module names (see modules/Bar.qml); reassign rather than mutate so bindings update.
-    property var hiddenModules: []
+    // Extras start hidden; they can be switched on in settings.
+    property var hiddenModules: ["capture", "idleInhibit", "colorPicker", "clipboard", "failedUnits", "brightness", "updates", "gamemode"]
     property bool clockSeconds: true
     property bool clock24h: true
-    property string weatherLocation: "London"
+    // Empty until set; the weather module stays hidden meanwhile.
+    property string weatherLocation: ""
     property int popupSeconds: 5
     property int popupMax: 5
     property bool osdEnabled: true
@@ -31,11 +33,91 @@ Singleton {
     property string workspaceCustomLabels: ""
     // App names whose notifications skip the popup but still land in history.
     property var mutedApps: []
+    // "top" or "bottom".
+    property string barPosition: "top"
+    readonly property bool barAtBottom: barPosition === "bottom"
+    // "<top|bottom>-<left|center|right>".
+    property string popupPosition: "bottom-right"
 
     readonly property string timeFormat: (clock24h ? "HH" : "h") + ":mm" + (clockSeconds ? ":ss" : "") + (clock24h ? "" : " AP")
 
     // Bar modules the settings page can hide, as [name, label].
-    readonly property var modules: [["workspaces", "Workspaces"], ["media", "Media"], ["privacy", "Privacy indicator"], ["weather", "Weather"], ["clock", "Clock"], ["volume", "Volume"], ["cpu", "CPU"], ["ram", "RAM"], ["notifications", "Notifications"], ["network", "Network"], ["bluetooth", "Bluetooth"]]
+    readonly property var modules: [["workspaces", "Workspaces"], ["media", "Media"], ["privacy", "Privacy indicator"], ["weather", "Weather"], ["clock", "Clock"], ["volume", "Volume"], ["cpu", "CPU"], ["ram", "RAM"], ["notifications", "Notifications"], ["network", "Network"], ["bluetooth", "Bluetooth"], ["dashboard", "System menu"], ["disk", "Disk usage"], ["updates", "Package updates"], ["failedUnits", "Failed units"], ["capture", "Screenshot and recording"], ["clipboard", "Clipboard history"], ["colorPicker", "Colour picker"], ["brightness", "Monitor brightness"], ["idleInhibit", "Idle inhibitor"], ["gamemode", "Gamemode"]]
+    // The system menu holds settings, so it can be moved but never hidden.
+    readonly property var unhideableModules: ["dashboard"]
+
+    // Module order per bar group. Saved as-is; read through `layout`, which repairs it.
+    readonly property var defaultLayout: ({
+            "left": ["workspaces"],
+            "center": ["media"],
+            "right": ["privacy", "weather", "clock", "volume", "brightness", "disk", "cpu", "ram", "notifications", "failedUnits", "gamemode", "updates", "clipboard", "colorPicker", "capture", "idleInhibit", "network", "bluetooth", "dashboard"]
+        })
+    property var barLayout: defaultLayout
+    // Screenshots open in satty; recordings include audio.
+    property bool captureAnnotate: false
+    property bool captureAudio: false
+
+    property string wallpaper: ""
+    // Empty means the default: the XDG Pictures folder plus /Wallpapers (see Wallpapers.folder).
+    property string wallpaperDir: ""
+    // Replaces the theme's colours with a palette matugen derives from the wallpaper.
+    property bool matchWallpaper: false
+    // "dark" or "light"
+    property string wallpaperThemeMode: "dark"
+    property var wallpaperColors: null
+    // Every known module exactly once: unknown names dropped, missing ones (e.g. added in a later
+    // version) placed after their predecessor in the default layout.
+    readonly property var layout: {
+        const known = modules.map(m => m[0]);
+        const seen = [];
+        const out = {
+            "left": [],
+            "center": [],
+            "right": []
+        };
+
+        for (const group of ["left", "center", "right"]) {
+            for (const name of barLayout?.[group] ?? []) {
+                if (known.includes(name) && !seen.includes(name)) {
+                    out[group].push(name);
+                    seen.push(name);
+                }
+            }
+        }
+
+        for (const group of ["left", "center", "right"]) {
+            const defaults = defaultLayout[group];
+
+            defaults.forEach((name, i) => {
+                if (seen.includes(name))
+                    return;
+
+                const before = defaults.slice(0, i).reverse().find(n => seen.includes(n));
+                const target = before ? ["left", "center", "right"].find(g => out[g].includes(before)) : group;
+                const at = before ? out[target].indexOf(before) + 1 : 0;
+
+                out[target].splice(at, 0, name);
+                seen.push(name);
+            });
+        }
+
+        return out;
+    }
+
+    function moduleLabel(name) {
+        return (modules.find(m => m[0] === name) ?? [name, name])[1];
+    }
+
+    function moveModule(name, group, index) {
+        const next = {
+            "left": layout.left.filter(n => n !== name),
+            "center": layout.center.filter(n => n !== name),
+            "right": layout.right.filter(n => n !== name)
+        };
+
+        next[group].splice(Math.max(0, Math.min(index, next[group].length)), 0, name);
+        barLayout = next;
+    }
 
     function moduleVisible(name) {
         return !hiddenModules.includes(name);
@@ -76,6 +158,16 @@ Singleton {
     onWorkspaceLabelsChanged: save()
     onWorkspaceCustomLabelsChanged: save()
     onMutedAppsChanged: save()
+    onBarPositionChanged: save()
+    onPopupPositionChanged: save()
+    onBarLayoutChanged: save()
+    onCaptureAnnotateChanged: save()
+    onCaptureAudioChanged: save()
+    onWallpaperChanged: save()
+    onWallpaperDirChanged: save()
+    onMatchWallpaperChanged: save()
+    onWallpaperThemeModeChanged: save()
+    onWallpaperColorsChanged: save()
 
     // qs ipc call settings get <key>   |   qs ipc call settings set <key> <json value>
     // The qs CLI swallows arguments starting with "[", so prefix arrays with a space: ' []'.

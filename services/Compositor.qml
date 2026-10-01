@@ -4,7 +4,6 @@ import QtQuick
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.I3
-import Quickshell.Io
 import Quickshell.WindowManager
 
 // One interface over the compositor's workspaces and focus, so the rest of the shell doesn't
