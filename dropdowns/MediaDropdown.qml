@@ -98,7 +98,8 @@ ColumnLayout {
             accent: Theme.blue
             enabled: root.player?.canSeek ?? false
             value: root.player ? root.player.position / root.player.length : 0
-            onMoved: value => root.player.position = value * root.player.length
+            // One seek on release; seeking on every move makes players report stale positions mid-drag.
+            onReleased: value => root.player.position = value * root.player.length
         }
 
         RowLayout {

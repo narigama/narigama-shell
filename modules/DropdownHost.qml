@@ -9,8 +9,8 @@ import qs.services
 
 // Per-screen window that slides the open dropdown out of the bar's edge (down from a top bar,
 // up from a bottom one).
-// The surface stays mapped at a fixed size with input masked to the panel: mapping or
-// resizing a layer lets the compositor fade/animate it, which should be a pure slide.
+// The surface keeps a fixed size with input masked to the panel, so the compositor never sees a
+// resize; it's mapped only while needed (see `visible`).
 PanelWindow {
     id: host
 
@@ -54,6 +54,7 @@ PanelWindow {
             "ram": ram,
             "workspaces": workspaces,
             "privacy": privacy,
+            "launcher": launcherDropdown,
             "disk": diskDropdown,
             "updates": updatesDropdown,
             "failedUnits": failedUnitsDropdown,
@@ -64,6 +65,10 @@ PanelWindow {
         })
 
     screen: targetScreen
+    // Mapped only while a dropdown is open or sliding shut: mapping makes Hyprland recompute what's
+    // under the pointer, so a click on content that appeared under a still pointer isn't lost. The
+    // compositor's map/unmap animation should be off for these surfaces (see README).
+    visible: open || closing
     anchors {
         top: !host.atBottom
         bottom: host.atBottom
@@ -81,7 +86,10 @@ PanelWindow {
     WlrLayershell.namespace: "narigama-dropdown"
     // Above the outside-click catcher (Top) where that's in use.
     WlrLayershell.layer: Compositor.hasFocusGrab ? WlrLayer.Top : WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: open ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
+    // The launcher is usually opened from a keybinding and must take typing straight away. Hyprland's
+    // focus grab hands it the keyboard; elsewhere it needs exclusive focus. (On Hyprland exclusive
+    // focus would also swallow every click outside it.)
+    WlrLayershell.keyboardFocus: !open ? WlrKeyboardFocus.None : Dropdowns.current === "launcher" && !Compositor.hasFocusGrab ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.OnDemand
 
     onOpenChanged: {
         slidIn = false;
@@ -375,5 +383,11 @@ PanelWindow {
         id: brightnessDropdown
 
         BrightnessDropdown {}
+    }
+
+    Component {
+        id: launcherDropdown
+
+        LauncherDropdown {}
     }
 }

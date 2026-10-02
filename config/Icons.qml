@@ -96,6 +96,8 @@ Singleton {
     readonly property string monitor: glyph(0xf0379)
     readonly property string cog: glyph(0xf0493)
     readonly property string dragHandle: glyph(0xf01dd)
+    readonly property string apps: glyph(0xf003b)
+    readonly property string calculator: glyph(0xf00ec)
     readonly property string harddisk: glyph(0xf02ca)
     readonly property string packageUp: glyph(0xf03d5)
     readonly property string alertCircle: glyph(0xf05d6)

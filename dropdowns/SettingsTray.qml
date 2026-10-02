@@ -270,6 +270,116 @@ GridLayout {
                 onToggled: ShellState.clock24h = !ShellState.clock24h
             }
         }
+
+        SectionHeader {
+            Layout.topMargin: 8
+            text: "Lock screen"
+        }
+
+        SettingRow {
+            label: "Lock when idle"
+
+            Toggle {
+                checked: ShellState.lockOnIdle
+                onToggled: ShellState.lockOnIdle = !ShellState.lockOnIdle
+            }
+        }
+
+        SettingRow {
+            visible: ShellState.lockOnIdle
+            label: "After"
+
+            Stepper {
+                value: ShellState.lockIdleMinutes
+                from: 1
+                to: 120
+                suffix: " min"
+                onChanged: value => ShellState.lockIdleMinutes = value
+            }
+        }
+
+        SettingRow {
+            label: "Lock before suspend"
+
+            Toggle {
+                checked: ShellState.lockBeforeSleep
+                onToggled: ShellState.lockBeforeSleep = !ShellState.lockBeforeSleep
+            }
+        }
+
+        SettingRow {
+            label: "Background"
+
+            Row {
+                spacing: 4
+
+                Repeater {
+                    model: [["wallpaper", "Wallpaper"], ["desktop", "Desktop"]]
+
+                    delegate: IconButton {
+                        required property var modelData
+
+                        text: modelData[1]
+                        implicitHeight: 26
+                        active: ShellState.lockBackground === modelData[0]
+                        background: Theme.surface
+                        onClicked: ShellState.lockBackground = modelData[0]
+                    }
+                }
+            }
+        }
+
+        SettingRow {
+            label: "Effect"
+
+            Row {
+                spacing: 4
+
+                Repeater {
+                    model: [["blur", "Blur"], ["pixelate", "Pixelate"], ["none", "None"]]
+
+                    delegate: IconButton {
+                        required property var modelData
+
+                        text: modelData[1]
+                        implicitHeight: 26
+                        active: ShellState.lockEffect === modelData[0]
+                        background: Theme.surface
+                        onClicked: ShellState.lockEffect = modelData[0]
+                    }
+                }
+            }
+        }
+
+        SettingRow {
+            visible: ShellState.lockEffect !== "none"
+            label: "Strength"
+
+            Stepper {
+                value: ShellState.lockEffectStrength
+                from: 1
+                to: 10
+                onChanged: value => ShellState.lockEffectStrength = value
+            }
+        }
+
+        SettingRow {
+            label: "Show notification count"
+
+            Toggle {
+                checked: ShellState.lockShowNotifications
+                onToggled: ShellState.lockShowNotifications = !ShellState.lockShowNotifications
+            }
+        }
+
+        StyledText {
+            visible: ShellState.lockBackground === "desktop" && !Tools.has("grim")
+            Layout.fillWidth: true
+            text: "Desktop background " + Tools.optionalHint("grim").toLowerCase() + "; the wallpaper is used meanwhile"
+            color: Theme.yellow
+            font.pixelSize: Theme.fontSize - 3
+            wrapMode: Text.Wrap
+        }
     }
 
     ColumnLayout {

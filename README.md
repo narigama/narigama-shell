@@ -22,6 +22,8 @@ A [Quickshell](https://quickshell.org) status bar and desktop shell for Wayland 
   - workspaces (and their windows, on Hyprland)
   - system tray
   - power actions
+- Launcher: slides down from the bar and searches installed apps (fuzzy, with often-launched apps ranked higher) and open windows; calculates sums, runs shell commands after `>` and searches clipboard history after `:`. Up/Down, Tab or Ctrl+N/P move through results; Enter runs one.
+- Lock screen: slides down over the desktop as it locks, showing a large clock over the wallpaper or a snapshot of the desktop, blurred, pixelated or untouched (set in settings), with the password row sliding up from the bottom edge when you start typing; unlocked with your login password (PAM `system-auth`). It locks from the system menu's Lock button or `loginctl lock-session`, before suspend, after an idle timeout (10 minutes by default, set in settings) and with `ipc call lock lock`, and shows how many notifications arrived while locked.
 - Notification daemon with popups (top or bottom, left, centre or right), history grouped by app, per-app muting and do-not-disturb.
 - On-screen display for volume, mic, device switches, bluetooth, network, keyboard layout and caps lock (see [Compositor support](#compositor-support) for what each compositor provides).
 - Privacy indicator for apps using the microphone, camera or screen share.
@@ -68,9 +70,27 @@ The compositor is detected from the environment (`HYPRLAND_INSTANCE_SIGNATURE`, 
 | OSD and IPC on the focused monitor | Yes | Yes | First monitor (no focus info) |
 | Keyboard layout OSD | Yes | Yes | No |
 | Caps lock OSD | Yes | No | No |
-| Click outside closes a dropdown | Yes, click passes through | Yes, click is consumed | Yes, click is consumed |
+| Click outside closes a dropdown | Yes (that click is consumed) | Yes (that click is consumed) | Yes (that click is consumed) |
 
 Everything else (audio, network, bluetooth, media, tray, notifications, stats) is compositor-independent. GNOME has no layer-shell, so the shell can't run there.
+
+## Hyprland layer rules
+
+The shell animates its own panels, and maps dropdowns only while they're open. Turn off Hyprland's layer animations for its surfaces, or they fade in as well as sliding:
+
+```lua
+hl.layer_rule({ name = "no-anim-narigama", match = { namespace = "^narigama-" }, no_anim = true })
+```
+
+## Lock screen
+
+The lock uses the ext-session-lock protocol (Hyprland, Sway, niri). If the shell restarts while locked, it locks again on start, but the compositor has to allow a new client to take over the lock; otherwise a crash leaves the compositor's fallback screen until you unlock from a TTY. On Hyprland, enable it with:
+
+```lua
+misc = { allow_session_lock_restore = true }
+```
+
+On Arch, `system-auth` includes `pam_faillock`, so three wrong passwords lock the account for 10 minutes (`faillock --user $USER --reset` as root clears it). The lock replaces hyprlock/swaylock and hypridle/swayidle for locking; logind's Unlock signal is ignored, so only the password unlocks.
 
 ## Running
 
@@ -97,6 +117,8 @@ Everything below works with `qs -p <dir> ipc call ...` (or `qs -c <name> ipc cal
 | `dropdown close` | Close any open dropdown |
 | `osd capsLock` | Show the caps lock state; Hyprland only (it has no caps lock event, so bind this to Caps_Lock) |
 | `osd message <text>` | Show a message in the OSD |
+| `launcher toggle` | Open or close the launcher on the focused monitor (bind this to a key) |
+| `lock lock` / `lock isLocked` | Lock the screen / report whether it's locked (there's no unlock call) |
 | `theme set <id>` / `theme list` | Switch theme / list theme ids |
 | `settings get <key>` / `settings set <key> <json>` | Read or change any setting |
 

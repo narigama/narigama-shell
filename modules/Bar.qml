@@ -175,6 +175,7 @@ Scope {
             "network": networkModule,
             "bluetooth": bluetoothModule,
             "dashboard": dashboardModule,
+            "launcher": launcherModule,
             "disk": diskModule,
             "updates": updatesModule,
             "failedUnits": failedUnitsModule,
@@ -269,6 +270,12 @@ Scope {
         id: dashboardModule
 
         Dashboard {}
+    }
+
+    Component {
+        id: launcherModule
+
+        LauncherButton {}
     }
 
     Component {

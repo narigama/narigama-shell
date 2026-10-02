@@ -34,6 +34,20 @@ Singleton {
         current = name;
     }
 
+    // Toggles on the focused monitor, from the bar item registered there.
+    function toggleFocused(name) {
+        const screenName = Compositor.focusedScreen()?.name ?? "";
+        const anchorItem = anchors[screenName + "/" + name];
+        const screen = Quickshell.screens.find(s => s.name === screenName);
+
+        if (!screen || !anchorItem)
+            return "no dropdown '" + name + "' on " + screenName;
+
+        toggle(name, anchorItem, screen);
+
+        return current;
+    }
+
     function close() {
         current = "";
     }
@@ -44,7 +58,7 @@ Singleton {
         target: "dropdown"
 
         function toggle(name: string): string {
-            return toggleOn(name, Compositor.focusedScreen()?.name ?? "");
+            return root.toggleFocused(name);
         }
 
         function toggleOn(name: string, screenName: string): string {
@@ -61,6 +75,15 @@ Singleton {
 
         function close(): void {
             root.close();
+        }
+    }
+
+    // qs ipc call launcher toggle   (focused monitor). Lives here because this service always runs.
+    IpcHandler {
+        target: "launcher"
+
+        function toggle(): string {
+            return root.toggleFocused("launcher");
         }
     }
 }

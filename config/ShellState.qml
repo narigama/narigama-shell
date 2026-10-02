@@ -8,7 +8,7 @@ import Quickshell.Io
 Singleton {
     id: root
 
-    readonly property var keys: ["notificationsDnd", "theme", "fontFamily", "iconFontFamily", "fontSize", "iconSize", "hiddenModules", "clockSeconds", "clock24h", "weatherLocation", "popupSeconds", "popupMax", "osdEnabled", "workspaceLabels", "workspaceCustomLabels", "mutedApps", "barPosition", "popupPosition", "barLayout", "captureAnnotate", "captureAudio", "wallpaper", "wallpaperDir", "matchWallpaper", "wallpaperThemeMode", "wallpaperColors"]
+    readonly property var keys: ["notificationsDnd", "theme", "fontFamily", "iconFontFamily", "fontSize", "iconSize", "hiddenModules", "clockSeconds", "clock24h", "weatherLocation", "popupSeconds", "popupMax", "osdEnabled", "workspaceLabels", "workspaceCustomLabels", "mutedApps", "barPosition", "popupPosition", "barLayout", "captureAnnotate", "captureAudio", "wallpaper", "wallpaperDir", "matchWallpaper", "wallpaperThemeMode", "wallpaperColors", "lockOnIdle", "lockIdleMinutes", "lockBeforeSleep", "lockBackground", "lockEffect", "lockEffectStrength", "lockShowNotifications"]
 
     property bool notificationsDnd: false
 
@@ -42,13 +42,13 @@ Singleton {
     readonly property string timeFormat: (clock24h ? "HH" : "h") + ":mm" + (clockSeconds ? ":ss" : "") + (clock24h ? "" : " AP")
 
     // Bar modules the settings page can hide, as [name, label].
-    readonly property var modules: [["workspaces", "Workspaces"], ["media", "Media"], ["privacy", "Privacy indicator"], ["weather", "Weather"], ["clock", "Clock"], ["volume", "Volume"], ["cpu", "CPU"], ["ram", "RAM"], ["notifications", "Notifications"], ["network", "Network"], ["bluetooth", "Bluetooth"], ["dashboard", "System menu"], ["disk", "Disk usage"], ["updates", "Package updates"], ["failedUnits", "Failed units"], ["capture", "Screenshot and recording"], ["clipboard", "Clipboard history"], ["colorPicker", "Colour picker"], ["brightness", "Monitor brightness"], ["idleInhibit", "Idle inhibitor"], ["gamemode", "Gamemode"]]
+    readonly property var modules: [["workspaces", "Workspaces"], ["media", "Media"], ["privacy", "Privacy indicator"], ["weather", "Weather"], ["clock", "Clock"], ["volume", "Volume"], ["cpu", "CPU"], ["ram", "RAM"], ["notifications", "Notifications"], ["network", "Network"], ["bluetooth", "Bluetooth"], ["dashboard", "System menu"], ["launcher", "Launcher"], ["disk", "Disk usage"], ["updates", "Package updates"], ["failedUnits", "Failed units"], ["capture", "Screenshot and recording"], ["clipboard", "Clipboard history"], ["colorPicker", "Colour picker"], ["brightness", "Monitor brightness"], ["idleInhibit", "Idle inhibitor"], ["gamemode", "Gamemode"]]
     // The system menu holds settings, so it can be moved but never hidden.
     readonly property var unhideableModules: ["dashboard"]
 
     // Module order per bar group. Saved as-is; read through `layout`, which repairs it.
     readonly property var defaultLayout: ({
-            "left": ["workspaces"],
+            "left": ["launcher", "workspaces"],
             "center": ["media"],
             "right": ["privacy", "weather", "clock", "volume", "brightness", "disk", "cpu", "ram", "notifications", "failedUnits", "gamemode", "updates", "clipboard", "colorPicker", "capture", "idleInhibit", "network", "bluetooth", "dashboard"]
         })
@@ -65,6 +65,17 @@ Singleton {
     // "dark" or "light"
     property string wallpaperThemeMode: "dark"
     property var wallpaperColors: null
+
+    property bool lockOnIdle: true
+    property int lockIdleMinutes: 10
+    property bool lockBeforeSleep: true
+    // "wallpaper" or "desktop" (a snapshot of the screen taken as it locks).
+    property string lockBackground: "wallpaper"
+    // "blur", "pixelate" or "none"
+    property string lockEffect: "blur"
+    // 1 (subtle) to 10 (strong)
+    property int lockEffectStrength: 4
+    property bool lockShowNotifications: true
     // Every known module exactly once: unknown names dropped, missing ones (e.g. added in a later
     // version) placed after their predecessor in the default layout.
     readonly property var layout: {
@@ -168,6 +179,13 @@ Singleton {
     onMatchWallpaperChanged: save()
     onWallpaperThemeModeChanged: save()
     onWallpaperColorsChanged: save()
+    onLockOnIdleChanged: save()
+    onLockIdleMinutesChanged: save()
+    onLockBeforeSleepChanged: save()
+    onLockBackgroundChanged: save()
+    onLockEffectChanged: save()
+    onLockEffectStrengthChanged: save()
+    onLockShowNotificationsChanged: save()
 
     // qs ipc call settings get <key>   |   qs ipc call settings set <key> <json value>
     // The qs CLI swallows arguments starting with "[", so prefix arrays with a space: ' []'.
@@ -224,6 +242,11 @@ Singleton {
                 for (const key of root.keys) {
                     if (key in data)
                         root[key] = data[key];
+                }
+                // Before lockOnIdle existed, 0 minutes meant off.
+                if (root.lockIdleMinutes <= 0) {
+                    root.lockOnIdle = false;
+                    root.lockIdleMinutes = 10;
                 }
             } catch (e) {
                 console.warn("Ignoring unreadable state.json:", e);

@@ -2,7 +2,9 @@
 //@ pragma Env QSG_RENDER_LOOP=threaded
 
 import Quickshell
+import Quickshell.Wayland
 import qs.modules
+import qs.services
 
 ShellRoot {
     Variants {
@@ -27,7 +29,17 @@ ShellRoot {
             OsdWindow {
                 targetScreen: perScreen.modelData
             }
+
+            LockReveal {
+                targetScreen: perScreen.modelData
+            }
         }
+    }
+
+    WlSessionLock {
+        locked: Lock.locked
+
+        LockSurface {}
     }
 
     NotificationPopups {
