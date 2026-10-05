@@ -79,8 +79,10 @@ PanelWindow {
     color: "transparent"
     exclusionMode: ExclusionMode.Normal
     exclusiveZone: 0
+    // The panel's resting place, not its sliding geometry: when the surface maps, the pointer is
+    // already inside the input region, so Hyprland gives it pointer focus without needing motion.
     mask: Region {
-        item: host.open ? panel : null
+        item: host.open ? restingArea : null
     }
 
     WlrLayershell.namespace: "narigama-dropdown"
@@ -97,6 +99,7 @@ PanelWindow {
         if (open) {
             closing = false;
             shown = Dropdowns.current;
+            nudge.restart();
             slideTimer.restart();
             return;
         }
@@ -117,6 +120,14 @@ PanelWindow {
         }
     }
 
+    // Once the surface has mapped, so Hyprland notices it under a still pointer.
+    Timer {
+        id: nudge
+
+        interval: 40
+        onTriggered: Compositor.nudgePointer()
+    }
+
     Timer {
         id: slideTimer
 
@@ -126,6 +137,15 @@ PanelWindow {
 
     Item {
         anchors.fill: parent
+
+        Item {
+            id: restingArea
+
+            x: panel.x
+            y: panel.openY
+            width: panel.width
+            height: panel.height
+        }
 
         Rectangle {
             id: panel
@@ -226,9 +246,24 @@ PanelWindow {
         active: Compositor.hasFocusGrab
 
         HyprlandFocusGrab {
-            active: host.open || host.barScope.trayOpen
+            id: grab
+
+            // Off briefly while re-arming after a spurious clear.
+            property bool rearming: false
+
+            active: (host.open || host.barScope.trayOpen) && !rearming
             windows: [host, host.bar]
-            onCleared: Dropdowns.close()
+            // Handing over from a menu to the tray (or between menus) changes which surfaces take
+            // input, and Hyprland sometimes reads that as a click outside; re-arm instead of closing.
+            onCleared: {
+                if (Date.now() - Dropdowns.changedAt < 200) {
+                    rearming = true;
+                    Qt.callLater(() => grab.rearming = false);
+                    return;
+                }
+
+                Dropdowns.close();
+            }
         }
     }
 

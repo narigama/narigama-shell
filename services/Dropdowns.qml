@@ -9,6 +9,8 @@ Singleton {
     id: root
 
     property string current: ""
+    // When `current` last changed, for telling a real outside click from a hand-over.
+    property double changedAt: 0
     property ShellScreen screen: null
     property real anchorX: 0
     // The bar item the open dropdown hangs from; it stays the anchor for pages reached from
@@ -47,6 +49,8 @@ Singleton {
 
         return current;
     }
+
+    onCurrentChanged: changedAt = Date.now()
 
     function close() {
         current = "";

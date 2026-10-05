@@ -31,8 +31,18 @@ Scope {
     readonly property real trayHeight: Math.min(tabRow.implicitHeight + 16 + trayPage.implicitHeight + 2 * trayPadding, trayMaxHeight)
 
     onTrayOpenChanged: {
-        if (trayOpen)
+        if (trayOpen) {
             trayTab = Dropdowns.current;
+            trayNudge.restart();
+        }
+    }
+
+    // The tray's input area grows under a still pointer; see Compositor.nudgePointer.
+    Timer {
+        id: trayNudge
+
+        interval: 40
+        onTriggered: Compositor.nudgePointer()
     }
 
     Connections {

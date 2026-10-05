@@ -132,6 +132,18 @@ Singleton {
                 }));
     }
 
+    // Hyprland only works out what's under the pointer when it moves, so a panel that appears under a
+    // still pointer misses the next click. Warping the cursor to where it already is makes it look
+    // again. Lua-config Hyprland needs `eval`; the classic config takes `dispatch movecursor`.
+    function nudgePointer() {
+        if (!isHyprland)
+            return;
+
+        Quickshell.execDetached(["sh", "-c", `
+            hyprctl eval 'local p = hl.get_cursor_pos(); hl.dispatch(hl.dsp.cursor.move({ x = p.x, y = p.y }))' 2>/dev/null | grep -q '^ok' ||
+                hyprctl dispatch movecursor $(hyprctl cursorpos | tr -d ,) >/dev/null 2>&1`]);
+    }
+
     // Window classes only arrive over IPC on request.
     function refreshWindows() {
         if (isHyprland)
