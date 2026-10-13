@@ -194,6 +194,7 @@ Scope {
             "colorPicker": colorPickerModule,
             "brightness": brightnessModule,
             "idleInhibit": idleInhibitModule,
+            "themeMode": themeModeModule,
             "gamemode": gamemodeModule
         })
 
@@ -334,6 +335,12 @@ Scope {
         id: idleInhibitModule
 
         IdleInhibitButton {}
+    }
+
+    Component {
+        id: themeModeModule
+
+        ThemeModeButton {}
     }
 
     Component {

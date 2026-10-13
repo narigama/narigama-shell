@@ -8,11 +8,16 @@ import Quickshell.Io
 Singleton {
     id: root
 
-    readonly property var keys: ["notificationsDnd", "theme", "fontFamily", "iconFontFamily", "fontSize", "iconSize", "hiddenModules", "clockSeconds", "clock24h", "weatherLocation", "popupSeconds", "popupMax", "osdEnabled", "workspaceLabels", "workspaceCustomLabels", "mutedApps", "barPosition", "popupPosition", "barLayout", "captureAnnotate", "captureAudio", "wallpaper", "wallpaperDir", "matchWallpaper", "wallpaperThemeMode", "wallpaperColors", "lockOnIdle", "lockIdleMinutes", "lockBeforeSleep", "lockBackground", "lockEffect", "lockEffectStrength", "lockShowNotifications"]
+    readonly property var keys: ["notificationsDnd", "theme", "lastDarkTheme", "lastLightTheme", "themeModeToApps", "fontFamily", "iconFontFamily", "fontSize", "iconSize", "hiddenModules", "clockSeconds", "clock24h", "weatherLocation", "popupSeconds", "popupMax", "osdEnabled", "workspaceLabels", "workspaceCustomLabels", "mutedApps", "barPosition", "popupPosition", "barLayout", "captureAnnotate", "captureAudio", "wallpaper", "wallpaperDir", "matchWallpaper", "wallpaperThemeMode", "wallpaperColors", "lockOnIdle", "lockIdleMinutes", "lockBeforeSleep", "lockBackground", "lockEffect", "lockEffectStrength", "lockShowNotifications"]
 
     property bool notificationsDnd: false
 
     property string theme: "nightfox"
+    // The dark/light toggle switches back to whichever theme of the other kind was picked last.
+    property string lastDarkTheme: "nightfox"
+    property string lastLightTheme: "dayfox"
+    // Mirrors dark/light into gsettings so portal-aware apps and GTK3 follow.
+    property bool themeModeToApps: true
     property string fontFamily: "IosevkaTermSlab Nerd Font"
     // Must contain the Nerd Font glyphs; config/Fonts.qml lists the installed candidates; Theme falls back if it is missing.
     property string iconFontFamily: "IosevkaTermSlab Nerd Font"
@@ -20,7 +25,7 @@ Singleton {
     property int iconSize: 24
     // Bar module names (see modules/Bar.qml); reassign rather than mutate so bindings update.
     // Extras start hidden; they can be switched on in settings.
-    property var hiddenModules: ["capture", "idleInhibit", "colorPicker", "clipboard", "failedUnits", "brightness", "updates", "gamemode"]
+    property var hiddenModules: ["capture", "idleInhibit", "colorPicker", "clipboard", "failedUnits", "brightness", "updates", "gamemode", "themeMode"]
     property bool clockSeconds: true
     property bool clock24h: true
     // Empty until set; the weather module stays hidden meanwhile.
@@ -42,7 +47,7 @@ Singleton {
     readonly property string timeFormat: (clock24h ? "HH" : "h") + ":mm" + (clockSeconds ? ":ss" : "") + (clock24h ? "" : " AP")
 
     // Bar modules the settings page can hide, as [name, label].
-    readonly property var modules: [["workspaces", "Workspaces"], ["media", "Media"], ["privacy", "Privacy indicator"], ["weather", "Weather"], ["clock", "Clock"], ["volume", "Volume"], ["cpu", "CPU"], ["ram", "RAM"], ["notifications", "Notifications"], ["network", "Network"], ["bluetooth", "Bluetooth"], ["dashboard", "System menu"], ["launcher", "Launcher"], ["disk", "Disk usage"], ["updates", "Package updates"], ["failedUnits", "Failed units"], ["capture", "Screenshot and recording"], ["clipboard", "Clipboard history"], ["colorPicker", "Colour picker"], ["brightness", "Monitor brightness"], ["idleInhibit", "Idle inhibitor"], ["gamemode", "Gamemode"]]
+    readonly property var modules: [["workspaces", "Workspaces"], ["media", "Media"], ["privacy", "Privacy indicator"], ["weather", "Weather"], ["clock", "Clock"], ["volume", "Volume"], ["cpu", "CPU"], ["ram", "RAM"], ["notifications", "Notifications"], ["network", "Network"], ["bluetooth", "Bluetooth"], ["dashboard", "System menu"], ["launcher", "Launcher"], ["disk", "Disk usage"], ["updates", "Package updates"], ["failedUnits", "Failed units"], ["capture", "Screenshot and recording"], ["clipboard", "Clipboard history"], ["colorPicker", "Colour picker"], ["brightness", "Monitor brightness"], ["idleInhibit", "Idle inhibitor"], ["themeMode", "Dark/light toggle"], ["gamemode", "Gamemode"]]
     // The system menu holds settings, so it can be moved but never hidden.
     readonly property var unhideableModules: ["dashboard"]
 
@@ -50,7 +55,7 @@ Singleton {
     readonly property var defaultLayout: ({
             "left": ["launcher", "workspaces"],
             "center": ["media"],
-            "right": ["privacy", "weather", "clock", "volume", "brightness", "disk", "cpu", "ram", "notifications", "failedUnits", "gamemode", "updates", "clipboard", "colorPicker", "capture", "idleInhibit", "network", "bluetooth", "dashboard"]
+            "right": ["privacy", "weather", "clock", "volume", "brightness", "disk", "cpu", "ram", "notifications", "failedUnits", "gamemode", "updates", "clipboard", "colorPicker", "capture", "idleInhibit", "themeMode", "network", "bluetooth", "dashboard"]
         })
     property var barLayout: defaultLayout
     // Screenshots open in satty; recordings include audio.
@@ -115,6 +120,13 @@ Singleton {
         return out;
     }
 
+    function toggleThemeMode() {
+        if (Theme.fromWallpaper)
+            wallpaperThemeMode = Theme.light ? "dark" : "light";
+        else
+            theme = Theme.light ? lastDarkTheme : lastLightTheme;
+    }
+
     function moduleLabel(name) {
         return (modules.find(m => m[0] === name) ?? [name, name])[1];
     }
@@ -154,7 +166,19 @@ Singleton {
     }
 
     onNotificationsDndChanged: save()
-    onThemeChanged: save()
+    onThemeChanged: {
+        const current = Themes.find(theme);
+
+        if (current.light)
+            lastLightTheme = current.id;
+        else
+            lastDarkTheme = current.id;
+
+        save();
+    }
+    onLastDarkThemeChanged: save()
+    onLastLightThemeChanged: save()
+    onThemeModeToAppsChanged: save()
     onFontFamilyChanged: save()
     onIconFontFamilyChanged: save()
     onFontSizeChanged: save()
@@ -210,7 +234,7 @@ Singleton {
         }
     }
 
-    // qs ipc call theme set <id>   |   qs ipc call theme list
+    // qs ipc call theme set <id>   |   qs ipc call theme list   |   qs ipc call theme toggle
     IpcHandler {
         target: "theme"
 
@@ -225,6 +249,12 @@ Singleton {
 
         function list(): string {
             return Themes.list.map(t => t.id).join("\n");
+        }
+
+        function toggle(): string {
+            root.toggleThemeMode();
+
+            return Theme.fromWallpaper ? root.wallpaperThemeMode : root.theme;
         }
     }
 

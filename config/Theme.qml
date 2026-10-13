@@ -7,6 +7,42 @@ import Quickshell
 Singleton {
     readonly property var current: Themes.find(ShellState.theme)
     readonly property bool fromWallpaper: ShellState.matchWallpaper && ShellState.wallpaperColors !== null
+    readonly property bool light: fromWallpaper ? ShellState.wallpaperThemeMode === "light" : current.light
+    // callLater coalesces a theme change that also moves lastDark/LightTheme into one run.
+    onLightChanged: Qt.callLater(applyToApps)
+    Component.onCompleted: Qt.callLater(applyToApps)
+
+    Connections {
+        target: ShellState
+
+        function onLastDarkThemeChanged() {
+            Qt.callLater(Theme.applyToApps);
+        }
+
+        function onLastLightThemeChanged() {
+            Qt.callLater(Theme.applyToApps);
+        }
+    }
+
+    // kitty picks dark-/light-theme.auto.conf from the portal color-scheme, so both are kept
+    // written before the scheme flips; USR1 makes running kittys reload a same-mode theme change.
+    // gtk-theme before color-scheme: Electron apps (Slack) re-derive the scheme from a gtk-theme change and land on light.
+    readonly property string appsScript: 'if command -v kitten >/dev/null; then
+    dir="${XDG_CONFIG_HOME:-$HOME/.config}/kitty"
+    kitten themes --dump-theme --cache-age=30 "$3" > "$dir/dark-theme.auto.conf.tmp" && mv "$dir/dark-theme.auto.conf.tmp" "$dir/dark-theme.auto.conf"
+    kitten themes --dump-theme --cache-age=30 "$4" > "$dir/light-theme.auto.conf.tmp" && mv "$dir/light-theme.auto.conf.tmp" "$dir/light-theme.auto.conf"
+    rm -f "$dir"/*-theme.auto.conf.tmp
+    pkill -USR1 -x kitty
+fi
+gsettings set org.gnome.desktop.interface gtk-theme "$1" && gsettings set org.gnome.desktop.interface color-scheme "$2"'
+
+    function applyToApps() {
+        if (!ShellState.themeModeToApps)
+            return;
+
+        Quickshell.execDetached(["sh", "-c", appsScript, "sh", light ? "Adwaita" : "Adwaita-dark", light ? "prefer-light" : "prefer-dark", Themes.find(ShellState.lastDarkTheme).kitty, Themes.find(ShellState.lastLightTheme).kitty]);
+    }
+
     readonly property var colors: fromWallpaper ? ShellState.wallpaperColors : current.colors
 
     readonly property color bg: colors.bg

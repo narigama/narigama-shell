@@ -6,11 +6,13 @@ import Quickshell
 // Colour schemes: the ten most-starred theme families on GitHub (Sep 2026) plus official
 // light variants. Slots: bg (dropdowns), surface (bar), elevated (hover/tracks), fg,
 // fgMuted, fgSubtle, primary (accent), red, yellow, green, blue (the cyan/teal accent).
+// kitty: the matching name in `kitten themes`.
 Singleton {
     readonly property var list: [
         {
             "id": "nightfox",
             "name": "Nightfox",
+            "kitty": "Nightfox",
             "light": false,
             "colors": {
                 "bg": "#131a24",
@@ -29,6 +31,7 @@ Singleton {
         {
             "id": "dracula",
             "name": "Dracula",
+            "kitty": "Dracula",
             "light": false,
             "colors": {
                 "bg": "#21222c",
@@ -47,6 +50,7 @@ Singleton {
         {
             "id": "catppuccin-mocha",
             "name": "Catppuccin Mocha",
+            "kitty": "Catppuccin-Mocha",
             "light": false,
             "colors": {
                 "bg": "#181825",
@@ -65,6 +69,7 @@ Singleton {
         {
             "id": "solarized-dark",
             "name": "Solarized Dark",
+            "kitty": "Solarized Dark",
             "light": false,
             "colors": {
                 "bg": "#002b36",
@@ -83,6 +88,7 @@ Singleton {
         {
             "id": "gruvbox-dark",
             "name": "Gruvbox Dark",
+            "kitty": "Gruvbox Dark",
             "light": false,
             "colors": {
                 "bg": "#1d2021",
@@ -101,6 +107,7 @@ Singleton {
         {
             "id": "tokyonight",
             "name": "Tokyo Night",
+            "kitty": "Tokyo Night",
             "light": false,
             "colors": {
                 "bg": "#16161e",
@@ -119,6 +126,7 @@ Singleton {
         {
             "id": "nord",
             "name": "Nord",
+            "kitty": "Nord",
             "light": false,
             "colors": {
                 "bg": "#2e3440",
@@ -137,6 +145,7 @@ Singleton {
         {
             "id": "kanagawa",
             "name": "Kanagawa",
+            "kitty": "kanagawa",
             "light": false,
             "colors": {
                 "bg": "#16161d",
@@ -155,6 +164,7 @@ Singleton {
         {
             "id": "everforest-dark",
             "name": "Everforest Dark",
+            "kitty": "Everforest Dark Medium",
             "light": false,
             "colors": {
                 "bg": "#232a2e",
@@ -173,6 +183,7 @@ Singleton {
         {
             "id": "onedark",
             "name": "One Dark",
+            "kitty": "One Dark",
             "light": false,
             "colors": {
                 "bg": "#21252b",
@@ -191,6 +202,7 @@ Singleton {
         {
             "id": "catppuccin-latte",
             "name": "Catppuccin Latte",
+            "kitty": "Catppuccin-Latte",
             "light": true,
             "colors": {
                 "bg": "#e6e9ef",
@@ -209,6 +221,7 @@ Singleton {
         {
             "id": "solarized-light",
             "name": "Solarized Light",
+            "kitty": "Solarized Light",
             "light": true,
             "colors": {
                 "bg": "#eee8d5",
@@ -227,6 +240,7 @@ Singleton {
         {
             "id": "gruvbox-light",
             "name": "Gruvbox Light",
+            "kitty": "Gruvbox Light",
             "light": true,
             "colors": {
                 "bg": "#f2e5bc",
@@ -245,6 +259,7 @@ Singleton {
         {
             "id": "tokyonight-day",
             "name": "Tokyo Night Day",
+            "kitty": "Tokyo Night Day",
             "light": true,
             "colors": {
                 "bg": "#d0d5e3",
@@ -263,6 +278,7 @@ Singleton {
         {
             "id": "dayfox",
             "name": "Dayfox",
+            "kitty": "Dayfox",
             "light": true,
             "colors": {
                 "bg": "#e4dcd4",
@@ -281,6 +297,7 @@ Singleton {
         {
             "id": "rose-pine-dawn",
             "name": "Rosé Pine Dawn",
+            "kitty": "Rosé Pine Dawn",
             "light": true,
             "colors": {
                 "bg": "#f2e9e1",
@@ -299,6 +316,7 @@ Singleton {
         {
             "id": "everforest-light",
             "name": "Everforest Light",
+            "kitty": "Everforest Light Medium",
             "light": true,
             "colors": {
                 "bg": "#efebd4",
@@ -317,6 +335,7 @@ Singleton {
         {
             "id": "one-light",
             "name": "One Light",
+            "kitty": "One Half Light",
             "light": true,
             "colors": {
                 "bg": "#f0f0f1",
@@ -335,6 +354,7 @@ Singleton {
         {
             "id": "github-light",
             "name": "GitHub Light",
+            "kitty": "GitHub Light",
             "light": true,
             "colors": {
                 "bg": "#f6f8fa",
@@ -353,6 +373,7 @@ Singleton {
         {
             "id": "kanagawa-lotus",
             "name": "Kanagawa Lotus",
+            "kitty": "kanagawa_light",
             "light": true,
             "colors": {
                 "bg": "#e5ddb0",

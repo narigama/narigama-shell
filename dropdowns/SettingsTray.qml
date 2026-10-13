@@ -93,6 +93,27 @@ GridLayout {
         Layout.preferredWidth: 1
         spacing: 8
 
+        SettingRow {
+            label: "Dark mode"
+
+            Toggle {
+                checked: !Theme.light
+                onToggled: ShellState.toggleThemeMode()
+            }
+        }
+
+        SettingRow {
+            label: "Apply to apps"
+
+            Toggle {
+                checked: ShellState.themeModeToApps
+                onToggled: {
+                    ShellState.themeModeToApps = !ShellState.themeModeToApps;
+                    Theme.applyToApps();
+                }
+            }
+        }
+
         SectionHeader {
             text: "Dark themes"
         }
