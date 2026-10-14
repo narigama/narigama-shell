@@ -8,7 +8,7 @@ import Quickshell.Io
 Singleton {
     id: root
 
-    readonly property var keys: ["notificationsDnd", "theme", "lastDarkTheme", "lastLightTheme", "themeModeToApps", "fontFamily", "iconFontFamily", "fontSize", "iconSize", "hiddenModules", "clockSeconds", "clock24h", "weatherLocation", "popupSeconds", "popupMax", "osdEnabled", "workspaceLabels", "workspaceCustomLabels", "mutedApps", "barPosition", "popupPosition", "barLayout", "captureAnnotate", "captureAudio", "wallpaper", "wallpaperDir", "matchWallpaper", "wallpaperThemeMode", "wallpaperColors", "lockOnIdle", "lockIdleMinutes", "lockBeforeSleep", "lockBackground", "lockEffect", "lockEffectStrength", "lockShowNotifications"]
+    readonly property var keys: ["notificationsDnd", "theme", "lastDarkTheme", "lastLightTheme", "themeModeToApps", "fontFamily", "iconFontFamily", "fontSize", "iconSize", "hiddenModules", "clockSeconds", "clock24h", "weatherLocation", "popupSeconds", "popupMax", "osdEnabled", "workspaceLabels", "workspaceCustomLabels", "mutedApps", "barPosition", "popupPosition", "barLayout", "captureAnnotate", "captureAudio", "wallpaper", "wallpaperDir", "matchWallpaper", "wallpaperThemeMode", "wallpaperColors", "lockOnIdle", "lockIdleMinutes", "lockBeforeSleep", "lockBackground", "lockEffect", "lockEffectStrength", "lockShowNotifications", "launcherPosition", "launcherDisabled"]
 
     property bool notificationsDnd: false
 
@@ -81,6 +81,12 @@ Singleton {
     // 1 (subtle) to 10 (strong)
     property int lockEffectStrength: 4
     property bool lockShowNotifications: true
+    // Where the keybinding opens the launcher: "left", "center", "right" (hanging from the bar) or
+    // "floating" (middle of the display). The bar button always opens it under itself.
+    property string launcherPosition: "center"
+    // Launcher result categories switched off, from `launcherCategories`.
+    property var launcherDisabled: []
+    readonly property var launcherCategories: [["apps", "Apps"], ["windows", "Windows"], ["calculator", "Calculator"], ["commands", "Shell commands (>)"], ["clipboard", "Clipboard history (:)"]]
     // Every known module exactly once: unknown names dropped, missing ones (e.g. added in a later
     // version) placed after their predecessor in the default layout.
     readonly property var layout: {
@@ -210,6 +216,8 @@ Singleton {
     onLockEffectChanged: save()
     onLockEffectStrengthChanged: save()
     onLockShowNotificationsChanged: save()
+    onLauncherPositionChanged: save()
+    onLauncherDisabledChanged: save()
 
     // qs ipc call settings get <key>   |   qs ipc call settings set <key> <json value>
     // The qs CLI swallows arguments starting with "[", so prefix arrays with a space: ' []'.

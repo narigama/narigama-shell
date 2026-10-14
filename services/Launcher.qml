@@ -18,6 +18,10 @@ Singleton {
 
     readonly property var apps: DesktopEntries.applications.values.filter(e => !e.noDisplay)
 
+    function enabled(category) {
+        return !ShellState.launcherDisabled.includes(category);
+    }
+
     // Higher is better, -1 for no match. Rewards prefix and word-start matches and runs of
     // consecutive characters; every query character must appear in order.
     function fuzzy(query, text) {
@@ -91,7 +95,10 @@ Singleton {
     function search(query) {
         const trimmed = query.trim();
 
-        if (trimmed.startsWith(">")) {
+        if (trimmed === "")
+            return [];
+
+        if (enabled("commands") && trimmed.startsWith(">")) {
             const command = trimmed.slice(1).trim();
 
             return command === "" ? [] : [
@@ -106,7 +113,7 @@ Singleton {
             ];
         }
 
-        if (trimmed.startsWith(":")) {
+        if (enabled("clipboard") && trimmed.startsWith(":")) {
             const needle = trimmed.slice(1).trim().toLowerCase();
 
             return Clipboard.entries.filter(e => needle === "" || e.text.toLowerCase().includes(needle)).slice(0, limit).map(e => ({
@@ -119,11 +126,8 @@ Singleton {
                     }));
         }
 
-        if (trimmed === "")
-            return apps.slice().sort((a, b) => (launches[b.id] ?? 0) - (launches[a.id] ?? 0) || a.name.localeCompare(b.name)).slice(0, limit).map(appResult);
-
         const results = [];
-        const value = calculate(trimmed);
+        const value = enabled("calculator") ? calculate(trimmed) : null;
 
         if (value !== null)
             results.push({
@@ -136,7 +140,7 @@ Singleton {
                 "run": () => Quickshell.execDetached(["wl-copy", String(value)])
             });
 
-        for (const entry of apps) {
+        for (const entry of enabled("apps") ? apps : []) {
             const score = appScore(trimmed, entry);
 
             if (score >= 0)
@@ -145,7 +149,7 @@ Singleton {
                 }));
         }
 
-        for (const toplevel of ToplevelManager.toplevels.values) {
+        for (const toplevel of enabled("windows") ? ToplevelManager.toplevels.values : []) {
             const score = Math.max(fuzzy(trimmed, toplevel.title), fuzzy(trimmed, toplevel.appId));
 
             if (score >= 0)

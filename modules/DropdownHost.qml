@@ -36,6 +36,8 @@ PanelWindow {
     // Synced a tick after content changes rather than bound: dropdowns backed by live data
     // (e.g. wifi scans) can change size mid-layout, which a direct binding reports as a loop.
     property real contentHeight: 0
+    // A floating panel's top, fixed as it opens so later content grows it downwards.
+    property real floatingY: 0
 
     function syncContentHeight() {
         contentHeight = loader.implicitHeight;
@@ -99,6 +101,7 @@ PanelWindow {
         if (open) {
             closing = false;
             shown = Dropdowns.current;
+            floatingY = Math.round(panel.displayMidY - panel.height / 2);
             nudge.restart();
             slideTimer.restart();
             return;
@@ -150,7 +153,10 @@ PanelWindow {
         Rectangle {
             id: panel
 
-            readonly property real openY: host.atBottom ? host.height - height : 0
+            // The display's midline in host coordinates; the host sits beside the bar's exclusive zone.
+            // shortcut: assumes the bar is the only exclusive zone on that edge, measure the host's real offset if other panels appear.
+            readonly property real displayMidY: host.atBottom ? host.height + Theme.barHeight - host.targetScreen.height / 2 : host.targetScreen.height / 2 - Theme.barHeight
+            readonly property real openY: Dropdowns.floating ? host.floatingY : host.atBottom ? host.height - height : 0
             readonly property real hiddenY: host.atBottom ? host.height : -height
 
             x: Math.round(Math.max(host.gutter, Math.min(host.width - width - host.gutter, Dropdowns.anchorX - width / 2)))
@@ -173,8 +179,9 @@ PanelWindow {
             }
 
             // Only the open/close slide animates y; once settled, y tracks the (animated) height.
+            // Floating pops up and away in place.
             Behavior on y {
-                enabled: !host.settled
+                enabled: !host.settled && !Dropdowns.floating
 
                 NumberAnimation {
                     duration: 180

@@ -11,7 +11,7 @@ import qs.services
 ColumnLayout {
     id: root
 
-    property var results: Launcher.search("")
+    property var results: []
     property int selected: 0
     readonly property int rowHeight: 48
     readonly property int visibleRows: 8
@@ -51,7 +51,6 @@ ColumnLayout {
 
         Layout.fillWidth: true
         implicitHeight: 40
-        placeholder: "Search apps and windows   > command   : clipboard   = sum"
         onTextChanged: {
             root.results = Launcher.search(text);
             root.selected = 0;
@@ -75,13 +74,15 @@ ColumnLayout {
     }
 
     StyledText {
-        visible: root.results.length === 0
+        visible: root.results.length === 0 && search.text.trim() !== ""
         Layout.topMargin: 4
-        text: search.text.trim().startsWith(":") && !Tools.available("clipboard") ? Tools.hint("clipboard") : "No matches"
+        text: search.text.trim().startsWith(":") && Launcher.enabled("clipboard") && !Tools.available("clipboard") ? Tools.hint("clipboard") : "No matches"
         color: Theme.fgMuted
     }
 
+    // Hidden while empty, or the column's spacing adds a gap below the search field.
     Item {
+        visible: root.results.length > 0
         Layout.fillWidth: true
         implicitHeight: list.height
 

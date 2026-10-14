@@ -294,6 +294,52 @@ GridLayout {
 
         SectionHeader {
             Layout.topMargin: 8
+            text: "Launcher"
+        }
+
+        StyledText {
+            text: "Position when opened from a key"
+        }
+
+        RowLayout {
+            Layout.fillWidth: true
+            spacing: 4
+
+            Repeater {
+                model: [["left", "Left"], ["center", "Centre"], ["right", "Right"], ["floating", "Floating"]]
+
+                delegate: IconButton {
+                    required property var modelData
+
+                    Layout.fillWidth: true
+                    text: modelData[1]
+                    implicitHeight: 26
+                    active: ShellState.launcherPosition === modelData[0]
+                    background: Theme.surface
+                    onClicked: ShellState.launcherPosition = modelData[0]
+                }
+            }
+        }
+
+        Repeater {
+            model: ShellState.launcherCategories
+
+            delegate: SettingRow {
+                id: categoryRow
+
+                required property var modelData
+
+                label: modelData[1]
+
+                Toggle {
+                    checked: !ShellState.launcherDisabled.includes(categoryRow.modelData[0])
+                    onToggled: ShellState.launcherDisabled = checked ? ShellState.launcherDisabled.concat([categoryRow.modelData[0]]) : ShellState.launcherDisabled.filter(c => c !== categoryRow.modelData[0])
+                }
+            }
+        }
+
+        SectionHeader {
+            Layout.topMargin: 8
             text: "Lock screen"
         }
 

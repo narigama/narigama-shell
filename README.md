@@ -22,7 +22,7 @@ A [Quickshell](https://quickshell.org) status bar and desktop shell for Wayland 
   - workspaces (and their windows, on Hyprland)
   - system tray
   - power actions
-- Launcher: slides down from the bar and searches installed apps (fuzzy, with often-launched apps ranked higher) and open windows; calculates sums, runs shell commands after `>` and searches clipboard history after `:`. Up/Down, Tab or Ctrl+N/P move through results; Enter runs one.
+- Launcher: slides down from the bar (or opens in the middle of the display; the key-bound position and which categories it searches are set in settings), shows nothing until you type, and searches installed apps (fuzzy, with often-launched apps ranked higher) and open windows; calculates sums, runs shell commands after `>` and searches clipboard history after `:`. Up/Down, Tab or Ctrl+N/P move through results; Enter runs one.
 - Lock screen: slides down over the desktop as it locks, showing a large clock over the wallpaper or a snapshot of the desktop, blurred, pixelated or untouched (set in settings), with the password row sliding up from the bottom edge when you start typing; unlocked with your login password (PAM `system-auth`). It locks from the system menu's Lock button or `loginctl lock-session`, before suspend, after an idle timeout (10 minutes by default, set in settings) and with `ipc call lock lock`, and shows how many notifications arrived while locked.
 - Notification daemon with popups (top or bottom, left, centre or right), history grouped by app, per-app muting and do-not-disturb.
 - On-screen display for volume, mic, device switches, bluetooth, network, keyboard layout and caps lock (see [Compositor support](#compositor-support) for what each compositor provides).
