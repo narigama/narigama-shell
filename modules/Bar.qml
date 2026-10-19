@@ -165,6 +165,12 @@ Scope {
         if (name === "brightness")
             return Desk.displays.length > 0;
 
+        if (name === "battery")
+            return Power.hasBattery;
+
+        if (name === "backlight")
+            return Backlight.screen !== null || Backlight.keyboard !== null;
+
         // hyprpicker needs Hyprland's screencopy and layer behaviour.
         if (name === "colorPicker")
             return Compositor.isHyprland;
@@ -195,7 +201,9 @@ Scope {
             "brightness": brightnessModule,
             "idleInhibit": idleInhibitModule,
             "themeMode": themeModeModule,
-            "gamemode": gamemodeModule
+            "gamemode": gamemodeModule,
+            "battery": batteryModule,
+            "backlight": backlightModule
         })
 
     Component {
@@ -323,6 +331,18 @@ Scope {
         id: colorPickerModule
 
         ColorPickerButton {}
+    }
+
+    Component {
+        id: batteryModule
+
+        BatteryButton {}
+    }
+
+    Component {
+        id: backlightModule
+
+        BacklightButton {}
     }
 
     Component {

@@ -26,7 +26,9 @@ Singleton {
     readonly property var packageFor: ({
             "wl-copy": "wl-clipboard",
             "wl-paste": "wl-clipboard",
-            "gamemoded": "gamemode"
+            "gamemoded": "gamemode",
+            "powerprofilesctl": "power-profiles-daemon",
+            "notify-send": "libnotify"
         })
 
     // Commands each module needs. Optional extras (satty, wf-recorder) are checked by the module.
@@ -37,10 +39,12 @@ Singleton {
             "clipboard": ["cliphist", "wl-copy", "wl-paste"],
             "colorPicker": ["hyprpicker", "wl-copy"],
             "brightness": ["ddcutil"],
-            "gamemode": ["gamemoded"]
+            "gamemode": ["gamemoded"],
+            "backlight": ["brightnessctl"],
+            "powerProfiles": ["powerprofilesctl"]
         })
 
-    readonly property var checked: ["systemctl", "grim", "slurp", "wl-copy", "wl-paste", "satty", "wf-recorder", "cliphist", "hyprpicker", "ddcutil", "gamemoded", "pacman", "fakeroot", "paru", "yay", "apt", "dnf", "awww", "swaybg", "matugen", "vipsthumbnail", "magick"]
+    readonly property var checked: ["systemctl", "grim", "slurp", "wl-copy", "wl-paste", "satty", "wf-recorder", "cliphist", "hyprpicker", "ddcutil", "gamemoded", "brightnessctl", "powerprofilesctl", "notify-send", "pacman", "fakeroot", "paru", "yay", "apt", "dnf", "awww", "swaybg", "matugen", "vipsthumbnail", "magick"]
 
     // Package manager used for update checks: "pacman", "apt", "dnf" or "".
     readonly property string packageManager: has("pacman") ? "pacman" : has("apt") ? "apt" : has("dnf") ? "dnf" : ""

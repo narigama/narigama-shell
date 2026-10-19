@@ -4,7 +4,7 @@ A [Quickshell](https://quickshell.org) status bar and desktop shell for Wayland 
 
 ## Features
 
-- Bar at the top or bottom of the screen with workspaces, media, privacy indicator, weather, clock, volume, CPU, RAM, disk usage, package updates, failed systemd units, notifications, clipboard history, screenshot and recording, colour picker, monitor brightness, idle inhibitor, gamemode, network, bluetooth and a system menu. Modules can be hidden, reordered and moved between the left, centre and right groups by dragging them in settings.
+- Bar at the top or bottom of the screen with workspaces, media, privacy indicator, weather, clock, volume, CPU, RAM, disk usage, package updates, failed systemd units, notifications, clipboard history, screenshot and recording, colour picker, monitor brightness, laptop screen brightness, idle inhibitor, gamemode, network, bluetooth, battery and a system menu. Modules can be hidden, reordered and moved between the left, centre and right groups by dragging them in settings.
 - A dropdown for each module that slides down from the bar:
   - calendar
   - hourly and 5-day weather (Open-Meteo)
@@ -19,13 +19,16 @@ A [Quickshell](https://quickshell.org) status bar and desktop shell for Wayland 
   - clipboard history with search
   - recently picked colours
   - DDC/CI brightness per external monitor
+  - laptop screen and keyboard backlight
+  - battery charge, time left, power draw and health, and power profiles
   - workspaces (and their windows, on Hyprland)
   - system tray
   - power actions
 - Launcher: slides down from the bar (or opens in the middle of the display; the key-bound position and which categories it searches are set in settings), shows nothing until you type, and searches installed apps (fuzzy, with often-launched apps ranked higher) and open windows; calculates sums, runs shell commands after `>` and searches clipboard history after `:`. Up/Down, Tab or Ctrl+N/P move through results; Enter runs one.
 - Lock screen: slides down over the desktop as it locks, showing a large clock over the wallpaper or a snapshot of the desktop, blurred, pixelated or untouched (set in settings), with the password row sliding up from the bottom edge when you start typing; unlocked with your login password (PAM `system-auth`). It locks from the system menu's Lock button or `loginctl lock-session`, before suspend, after an idle timeout (10 minutes by default, set in settings) and with `ipc call lock lock`, and shows how many notifications arrived while locked.
 - Notification daemon with popups (top or bottom, left, centre or right), history grouped by app, per-app muting and do-not-disturb.
-- On-screen display for volume, mic, device switches, bluetooth, network, keyboard layout and caps lock (see [Compositor support](#compositor-support) for what each compositor provides).
+- Battery warnings as a notification at 15% and again at 5%.
+- On-screen display for volume, mic, screen and keyboard brightness, device switches, bluetooth, network, keyboard layout and caps lock (see [Compositor support](#compositor-support) for what each compositor provides).
 - Privacy indicator for apps using the microphone, camera or screen share.
 - Workspace tabs that pulse when a window asks for attention.
 - A full-width tray the bar slides away from its edge to reveal, with tabs for settings and wallpapers. The wallpaper carousel pans with the pointer, applies to all monitors or chosen ones (awww, or swaybg as a fallback), and can derive the shell's colours from the wallpaper with matugen.
@@ -52,6 +55,8 @@ Some modules need extra tools. Disk usage is on by default; the rest of these st
 | Colour picker | `hyprpicker`, `wl-clipboard` (Hyprland only) |
 | Monitor brightness | `ddcutil`, with access to `/dev/i2c-*` (usually the `i2c` group) |
 | Gamemode | `gamemode` |
+| Battery | UPower; `power-profiles-daemon` for power profiles, `libnotify` for low-battery notifications |
+| Screen brightness | `brightnessctl` (laptop screen and keyboard backlight) |
 | Wallpapers | `awww` (or `swaybg`), and `libvips` (or ImageMagick) for thumbnails; `matugen` to match colours |
 
 Update checks: on Arch the sync databases are copied and refreshed privately with fakeroot (like `checkupdates`), so the system databases are never touched; on Debian/Ubuntu the list comes from the last `apt update`; on Fedora `dnf check-update` refreshes its own cache. The terminal for upgrades and unit logs comes from `$TERMINAL`, then `xdg-terminal-exec`, then the first of foot, kitty, alacritty, wezterm, ghostty, gnome-terminal and konsole that is installed; set `terminalCommand` in `config/Config.qml` to override it. Screenshots and recordings go to `Screenshots` and `Recordings` in your XDG Pictures and Videos folders, and wallpapers default to `Wallpapers` in Pictures. Weather stays hidden until a city is set in settings.
@@ -117,12 +122,14 @@ Everything below works with `qs -p <dir> ipc call ...` (or `qs -c <name> ipc cal
 | `dropdown close` | Close any open dropdown |
 | `osd capsLock` | Show the caps lock state; Hyprland only (it has no caps lock event, so bind this to Caps_Lock) |
 | `osd message <text>` | Show a message in the OSD |
+| `backlight up` / `backlight down` | Change the laptop screen brightness by 5% and show it in the OSD (bind to the brightness keys) |
+| `backlight keyboardUp` / `backlight keyboardDown` | Step the keyboard backlight and show it in the OSD |
 | `launcher toggle` | Open or close the launcher on the focused monitor (bind this to a key) |
 | `lock lock` / `lock isLocked` | Lock the screen / report whether it's locked (there's no unlock call) |
 | `theme set <id>` / `theme list` | Switch theme / list theme ids |
 | `settings get <key>` / `settings set <key> <json>` | Read or change any setting |
 
-Dropdown names: `calendar`, `weather`, `media`, `audio`, `network`, `bluetooth`, `notifications`, `dashboard`, `cpu`, `ram`, `workspaces`, `privacy`, `disk`, `updates`, `failedUnits`, `capture`, `clipboard`, `colors`, `brightness`. The tray tabs open the same way: `settings`, `wallpapers`.
+Dropdown names: `calendar`, `weather`, `media`, `audio`, `network`, `bluetooth`, `notifications`, `dashboard`, `cpu`, `ram`, `workspaces`, `privacy`, `disk`, `updates`, `failedUnits`, `capture`, `clipboard`, `colors`, `brightness`, `battery`, `backlight`. The tray tabs open the same way: `settings`, `wallpapers`.
 
 The `qs` CLI swallows arguments that start with `[`, so prefix JSON arrays with a space: `settings set mutedApps ' ["Slack"]'`.
 
@@ -137,6 +144,10 @@ hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_
 hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"), { locked = true, repeating = true })
 hl.bind("XF86AudioMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"), { locked = true })
 hl.bind("Caps_Lock", hl.dsp.exec_cmd("sleep 0.1 && qs -p /path/to/narigama-shell ipc call osd capsLock"), { locked = true })
+hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("qs -p /path/to/narigama-shell ipc call backlight up"), { locked = true, repeating = true })
+hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("qs -p /path/to/narigama-shell ipc call backlight down"), { locked = true, repeating = true })
+hl.bind("XF86KbdBrightnessUp", hl.dsp.exec_cmd("qs -p /path/to/narigama-shell ipc call backlight keyboardUp"), { locked = true })
+hl.bind("XF86KbdBrightnessDown", hl.dsp.exec_cmd("qs -p /path/to/narigama-shell ipc call backlight keyboardDown"), { locked = true })
 ```
 
 Sway:
@@ -145,6 +156,8 @@ Sway:
 bindsym --locked XF86AudioRaiseVolume exec wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+
 bindsym --locked XF86AudioLowerVolume exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
 bindsym --locked XF86AudioMute exec wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+bindsym --locked XF86MonBrightnessUp exec qs -p /path/to/narigama-shell ipc call backlight up
+bindsym --locked XF86MonBrightnessDown exec qs -p /path/to/narigama-shell ipc call backlight down
 ```
 
 niri:
@@ -154,6 +167,8 @@ binds {
     XF86AudioRaiseVolume allow-when-locked=true { spawn "wpctl" "set-volume" "-l" "1" "@DEFAULT_AUDIO_SINK@" "5%+"; }
     XF86AudioLowerVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-"; }
     XF86AudioMute allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
+    XF86MonBrightnessUp allow-when-locked=true { spawn "qs" "-p" "/path/to/narigama-shell" "ipc" "call" "backlight" "up"; }
+    XF86MonBrightnessDown allow-when-locked=true { spawn "qs" "-p" "/path/to/narigama-shell" "ipc" "call" "backlight" "down"; }
 }
 ```
 

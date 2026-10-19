@@ -47,7 +47,7 @@ Singleton {
     readonly property string timeFormat: (clock24h ? "HH" : "h") + ":mm" + (clockSeconds ? ":ss" : "") + (clock24h ? "" : " AP")
 
     // Bar modules the settings page can hide, as [name, label].
-    readonly property var modules: [["workspaces", "Workspaces"], ["media", "Media"], ["privacy", "Privacy indicator"], ["weather", "Weather"], ["clock", "Clock"], ["volume", "Volume"], ["cpu", "CPU"], ["ram", "RAM"], ["notifications", "Notifications"], ["network", "Network"], ["bluetooth", "Bluetooth"], ["dashboard", "System menu"], ["launcher", "Launcher"], ["disk", "Disk usage"], ["updates", "Package updates"], ["failedUnits", "Failed units"], ["capture", "Screenshot and recording"], ["clipboard", "Clipboard history"], ["colorPicker", "Colour picker"], ["brightness", "Monitor brightness"], ["idleInhibit", "Idle inhibitor"], ["themeMode", "Dark/light toggle"], ["gamemode", "Gamemode"]]
+    readonly property var modules: [["workspaces", "Workspaces"], ["media", "Media"], ["privacy", "Privacy indicator"], ["weather", "Weather"], ["clock", "Clock"], ["volume", "Volume"], ["cpu", "CPU"], ["ram", "RAM"], ["notifications", "Notifications"], ["network", "Network"], ["bluetooth", "Bluetooth"], ["dashboard", "System menu"], ["launcher", "Launcher"], ["disk", "Disk usage"], ["updates", "Package updates"], ["failedUnits", "Failed units"], ["capture", "Screenshot and recording"], ["clipboard", "Clipboard history"], ["colorPicker", "Colour picker"], ["brightness", "Monitor brightness"], ["idleInhibit", "Idle inhibitor"], ["themeMode", "Dark/light toggle"], ["gamemode", "Gamemode"], ["battery", "Battery"], ["backlight", "Screen brightness"]]
     // The system menu holds settings, so it can be moved but never hidden.
     readonly property var unhideableModules: ["dashboard"]
 
@@ -55,7 +55,7 @@ Singleton {
     readonly property var defaultLayout: ({
             "left": ["launcher", "workspaces"],
             "center": ["media"],
-            "right": ["privacy", "weather", "clock", "volume", "brightness", "disk", "cpu", "ram", "notifications", "failedUnits", "gamemode", "updates", "clipboard", "colorPicker", "capture", "idleInhibit", "themeMode", "network", "bluetooth", "dashboard"]
+            "right": ["privacy", "weather", "clock", "volume", "backlight", "brightness", "disk", "cpu", "ram", "notifications", "failedUnits", "gamemode", "updates", "clipboard", "colorPicker", "capture", "idleInhibit", "themeMode", "network", "bluetooth", "battery", "dashboard"]
         })
     property var barLayout: defaultLayout
     // Screenshots open in satty; recordings include audio.

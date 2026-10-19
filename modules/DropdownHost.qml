@@ -63,7 +63,9 @@ PanelWindow {
             "capture": captureDropdown,
             "clipboard": clipboardDropdown,
             "colors": colorsDropdown,
-            "brightness": brightnessDropdown
+            "brightness": brightnessDropdown,
+            "battery": batteryDropdown,
+            "backlight": backlightDropdown
         })
 
     screen: targetScreen
@@ -425,6 +427,18 @@ PanelWindow {
         id: brightnessDropdown
 
         BrightnessDropdown {}
+    }
+
+    Component {
+        id: batteryDropdown
+
+        BatteryDropdown {}
+    }
+
+    Component {
+        id: backlightDropdown
+
+        BacklightDropdown {}
     }
 
     Component {

@@ -63,6 +63,15 @@ Singleton {
 
     readonly property var wifiStrength: [glyph(0xf091f), glyph(0xf0922), glyph(0xf0925), glyph(0xf0928)]
     readonly property string wifiOffline: glyph(0xf092f)
+
+    // battery-outline, battery-10 .. battery-90, battery.
+    readonly property var batteryLevels: [glyph(0xf008e), glyph(0xf007a), glyph(0xf007b), glyph(0xf007c), glyph(0xf007d), glyph(0xf007e), glyph(0xf007f), glyph(0xf0080), glyph(0xf0081), glyph(0xf0082), glyph(0xf0079)]
+    readonly property string batteryCharging: glyph(0xf0084)
+    readonly property string batteryAlert: glyph(0xf0083)
+    readonly property string powerPlug: glyph(0xf06a5)
+    readonly property string leaf: glyph(0xf032a)
+    readonly property string scaleBalance: glyph(0xf05d1)
+    readonly property string speedometer: glyph(0xf04c5)
     readonly property string wifiOff: glyph(0xf092e)
     readonly property string wifiAlert: glyph(0xf092b)
     readonly property string ethernet: glyph(0xf0200)
@@ -210,6 +219,13 @@ Singleton {
         const index = Math.ceil(Math.round(volume * 100) / (100 / volumeLevels.length)) - 1;
 
         return volumeLevels[Math.max(0, Math.min(volumeLevels.length - 1, index))];
+    }
+
+    function forBattery(level, charging) {
+        if (charging)
+            return batteryCharging;
+
+        return batteryLevels[Math.max(0, Math.min(batteryLevels.length - 1, Math.round(level * 10)))];
     }
 
     // 0-25%, 26-50%, 51-75%, 76-100%.
