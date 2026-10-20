@@ -60,6 +60,37 @@ ColumnLayout {
     }
 
     SectionHeader {
+        visible: root.streams.length > 0
+        text: "Applications"
+    }
+
+    Repeater {
+        model: root.streams
+
+        delegate: ColumnLayout {
+            required property PwNode modelData
+
+            Layout.fillWidth: true
+            spacing: 0
+
+            StyledText {
+                Layout.fillWidth: true
+                Layout.leftMargin: 12
+                text: (modelData.properties["application.name"] || modelData.name) + (modelData.properties["media.name"] ? " · " + modelData.properties["media.name"] : "")
+                color: Theme.fgMuted
+                font.pixelSize: Theme.fontSize - 2
+            }
+
+            VolumeControl {
+                node: modelData
+                icon: Icons.volumeHigh
+                mutedIcon: Icons.volumeOff
+            }
+        }
+    }
+
+    SectionHeader {
+        Layout.topMargin: root.streams.length > 0 ? 8 : 0
         text: "Output"
     }
 
@@ -104,37 +135,6 @@ ColumnLayout {
             title: root.deviceName(modelData)
             highlighted: modelData === Pipewire.defaultAudioSource
             onClicked: Pipewire.preferredDefaultAudioSource = modelData
-        }
-    }
-
-    SectionHeader {
-        Layout.topMargin: 8
-        visible: root.streams.length > 0
-        text: "Applications"
-    }
-
-    Repeater {
-        model: root.streams
-
-        delegate: ColumnLayout {
-            required property PwNode modelData
-
-            Layout.fillWidth: true
-            spacing: 0
-
-            StyledText {
-                Layout.fillWidth: true
-                Layout.leftMargin: 12
-                text: (modelData.properties["application.name"] || modelData.name) + (modelData.properties["media.name"] ? " · " + modelData.properties["media.name"] : "")
-                color: Theme.fgMuted
-                font.pixelSize: Theme.fontSize - 2
-            }
-
-            VolumeControl {
-                node: modelData
-                icon: Icons.volumeHigh
-                mutedIcon: Icons.volumeOff
-            }
         }
     }
 }

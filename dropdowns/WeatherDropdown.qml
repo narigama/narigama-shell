@@ -47,15 +47,16 @@ ColumnLayout {
         ColumnLayout {
             spacing: 2
 
-            StyledText {
+            RollingText {
                 text: root.current ? Math.round(root.current.temperature_2m) + "°C" : ""
                 color: Theme.primary
-                font.pixelSize: 32
-                font.bold: true
+                pixelSize: 32
+                bold: true
             }
 
-            StyledText {
+            RollingText {
                 text: root.current ? Weather.describe(root.current.weather_code) : ""
+                delay: 60
             }
         }
     }

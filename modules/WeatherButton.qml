@@ -9,6 +9,7 @@ BarButton {
 
     icon: current ? Weather.icon(current.weather_code, current.is_day) : ""
     label: current ? Math.round(current.temperature_2m) + "°" : ""
+    rollLabel: true
     color: Theme.yellow
     leftDropdown: "weather"
 }

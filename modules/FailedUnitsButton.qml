@@ -7,6 +7,7 @@ import qs.services
 BarButton {
     icon: Icons.alertCircle
     label: String(SystemHealth.failedUnits.length)
+    rollLabel: true
     color: Theme.red
     leftDropdown: "failedUnits"
 }

@@ -93,6 +93,10 @@ GridLayout {
         Layout.preferredWidth: 1
         spacing: 8
 
+        SectionHeader {
+            text: "Theme"
+        }
+
         SettingRow {
             label: "Dark mode"
 
@@ -115,6 +119,7 @@ GridLayout {
         }
 
         SectionHeader {
+            Layout.topMargin: 16
             text: "Dark themes"
         }
 
@@ -145,7 +150,7 @@ GridLayout {
         }
 
         SectionHeader {
-            Layout.topMargin: 4
+            Layout.topMargin: 16
             text: "Light themes"
         }
 
@@ -200,7 +205,7 @@ GridLayout {
         }
 
         SectionHeader {
-            Layout.topMargin: 8
+            Layout.topMargin: 16
             text: "Bar modules"
         }
 
@@ -270,7 +275,7 @@ GridLayout {
         }
 
         SectionHeader {
-            Layout.topMargin: 8
+            Layout.topMargin: 16
             text: "Clock"
         }
 
@@ -293,12 +298,14 @@ GridLayout {
         }
 
         SectionHeader {
-            Layout.topMargin: 8
+            Layout.topMargin: 16
             text: "Launcher"
         }
 
         StyledText {
             text: "Position when opened from a key"
+            color: Theme.fgMuted
+            font.pixelSize: Theme.fontSize - 2
         }
 
         RowLayout {
@@ -339,7 +346,7 @@ GridLayout {
         }
 
         SectionHeader {
-            Layout.topMargin: 8
+            Layout.topMargin: 16
             text: "Lock screen"
         }
 
@@ -558,7 +565,7 @@ GridLayout {
         }
 
         SectionHeader {
-            Layout.topMargin: 8
+            Layout.topMargin: 16
             text: "Notifications"
         }
 
@@ -577,6 +584,8 @@ GridLayout {
         StyledText {
             Layout.topMargin: 4
             text: "Popup position"
+            color: Theme.fgMuted
+            font.pixelSize: Theme.fontSize - 2
         }
 
         Repeater {

@@ -99,11 +99,17 @@ On Arch, `system-auth` includes `pam_faillock`, so three wrong passwords lock th
 
 ## Running
 
+Install (or update) into `~/.config/quickshell/narigama-shell`:
+
 ```sh
-qs -p /path/to/narigama-shell
+curl -fsSL https://raw.githubusercontent.com/narigama/narigama-shell/master/install.sh | bash
 ```
 
-Or link it into `~/.config/quickshell/narigama-shell` and run `qs -c narigama-shell`.
+Then start it with:
+
+```sh
+qs -c narigama-shell
+```
 
 ## Settings
 
@@ -113,7 +119,7 @@ Fixed behaviour (commands for lock, logout, reboot and power off, refresh interv
 
 ## IPC
 
-Everything below works with `qs -p <dir> ipc call ...` (or `qs -c <name> ipc call ...`), so it can be bound to keys.
+Everything below works with `qs -c narigama-shell ipc call ...`, so it can be bound to keys.
 
 | Command | Effect |
 | --- | --- |
@@ -143,11 +149,11 @@ Hyprland (Lua config):
 hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"), { locked = true, repeating = true })
 hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"), { locked = true, repeating = true })
 hl.bind("XF86AudioMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"), { locked = true })
-hl.bind("Caps_Lock", hl.dsp.exec_cmd("sleep 0.1 && qs -p /path/to/narigama-shell ipc call osd capsLock"), { locked = true })
-hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("qs -p /path/to/narigama-shell ipc call backlight up"), { locked = true, repeating = true })
-hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("qs -p /path/to/narigama-shell ipc call backlight down"), { locked = true, repeating = true })
-hl.bind("XF86KbdBrightnessUp", hl.dsp.exec_cmd("qs -p /path/to/narigama-shell ipc call backlight keyboardUp"), { locked = true })
-hl.bind("XF86KbdBrightnessDown", hl.dsp.exec_cmd("qs -p /path/to/narigama-shell ipc call backlight keyboardDown"), { locked = true })
+hl.bind("Caps_Lock", hl.dsp.exec_cmd("sleep 0.1 && qs -c narigama-shell ipc call osd capsLock"), { locked = true })
+hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("qs -c narigama-shell ipc call backlight up"), { locked = true, repeating = true })
+hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("qs -c narigama-shell ipc call backlight down"), { locked = true, repeating = true })
+hl.bind("XF86KbdBrightnessUp", hl.dsp.exec_cmd("qs -c narigama-shell ipc call backlight keyboardUp"), { locked = true })
+hl.bind("XF86KbdBrightnessDown", hl.dsp.exec_cmd("qs -c narigama-shell ipc call backlight keyboardDown"), { locked = true })
 ```
 
 Sway:
@@ -156,8 +162,8 @@ Sway:
 bindsym --locked XF86AudioRaiseVolume exec wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+
 bindsym --locked XF86AudioLowerVolume exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
 bindsym --locked XF86AudioMute exec wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
-bindsym --locked XF86MonBrightnessUp exec qs -p /path/to/narigama-shell ipc call backlight up
-bindsym --locked XF86MonBrightnessDown exec qs -p /path/to/narigama-shell ipc call backlight down
+bindsym --locked XF86MonBrightnessUp exec qs -c narigama-shell ipc call backlight up
+bindsym --locked XF86MonBrightnessDown exec qs -c narigama-shell ipc call backlight down
 ```
 
 niri:
@@ -167,8 +173,8 @@ binds {
     XF86AudioRaiseVolume allow-when-locked=true { spawn "wpctl" "set-volume" "-l" "1" "@DEFAULT_AUDIO_SINK@" "5%+"; }
     XF86AudioLowerVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-"; }
     XF86AudioMute allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
-    XF86MonBrightnessUp allow-when-locked=true { spawn "qs" "-p" "/path/to/narigama-shell" "ipc" "call" "backlight" "up"; }
-    XF86MonBrightnessDown allow-when-locked=true { spawn "qs" "-p" "/path/to/narigama-shell" "ipc" "call" "backlight" "down"; }
+    XF86MonBrightnessUp allow-when-locked=true { spawn "qs" "-c" "narigama-shell" "ipc" "call" "backlight" "up"; }
+    XF86MonBrightnessDown allow-when-locked=true { spawn "qs" "-c" "narigama-shell" "ipc" "call" "backlight" "down"; }
 }
 ```
 

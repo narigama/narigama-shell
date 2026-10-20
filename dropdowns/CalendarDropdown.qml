@@ -35,7 +35,7 @@ ColumnLayout {
         font.bold: true
     }
 
-    StyledText {
+    RollingText {
         Layout.alignment: Qt.AlignHCenter
         text: Qt.formatDateTime(clock.date, "dddd d MMMM yyyy")
         color: Theme.fgMuted
@@ -49,11 +49,11 @@ ColumnLayout {
             onClicked: root.shiftMonth(-1)
         }
 
-        StyledText {
+        RollingText {
             Layout.fillWidth: true
             horizontalAlignment: Text.AlignHCenter
             text: Qt.formatDate(new Date(root.year, root.month, 1), "MMMM yyyy")
-            font.bold: true
+            bold: true
 
             MouseArea {
                 anchors.fill: parent

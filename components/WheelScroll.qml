@@ -6,17 +6,30 @@ MouseArea {
     id: root
 
     required property Flickable flickable
-    readonly property real pixelsPerNotch: 100
+    readonly property real pixelsPerNotch: 160
+    property real targetY: 0
 
     anchors.fill: flickable
     z: -1
     acceptedButtons: Qt.NoButton
 
-    onWheel: wheel => {
-        // Touchpads report pixel deltas; mice report angle deltas in 1/8° (120 per notch).
-        const delta = wheel.pixelDelta.y !== 0 ? wheel.pixelDelta.y * 1.5 : wheel.angleDelta.y / 120 * pixelsPerNotch;
-        const max = Math.max(0, flickable.contentHeight - flickable.height);
+    NumberAnimation {
+        id: anim
 
-        flickable.contentY = Math.max(0, Math.min(max, flickable.contentY - delta));
+        target: root.flickable
+        property: "contentY"
+        to: root.targetY
+        duration: 180
+        easing.type: Easing.OutCubic
+    }
+
+    onWheel: wheel => {
+        // QtWayland populates pixelDelta (~15px) even for discrete mouse wheels, so use angleDelta (120 per notch).
+        const delta = wheel.angleDelta.y !== 0 ? wheel.angleDelta.y / 120 * pixelsPerNotch : wheel.pixelDelta.y * 3;
+        const max = Math.max(0, flickable.contentHeight - flickable.height);
+        const base = anim.running ? targetY : flickable.contentY;
+
+        targetY = Math.max(0, Math.min(max, base - delta));
+        anim.restart();
     }
 }

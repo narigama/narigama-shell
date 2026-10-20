@@ -20,15 +20,15 @@ ColumnLayout {
         RowLayout {
             Layout.fillWidth: true
 
-            StyledText {
+            RollingText {
                 Layout.fillWidth: true
                 text: Power.status
             }
 
-            StyledText {
+            RollingText {
                 text: Math.round(Power.level * 100) + "%"
                 color: Power.low ? Theme.red : Theme.green
-                font.bold: true
+                bold: true
             }
         }
 

@@ -35,12 +35,12 @@ Rectangle {
             font.pixelSize: root.iconSize
         }
 
-        StyledText {
+        RollingText {
             anchors.verticalCenter: parent.verticalCenter
             visible: root.text !== ""
             text: root.text
             color: root.active ? Theme.surface : root.foreground
-            font.bold: true
+            bold: true
         }
     }
 

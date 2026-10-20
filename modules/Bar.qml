@@ -28,7 +28,7 @@ Scope {
     property string trayTab: "settings"
     readonly property Item trayPage: trayTab === "wallpapers" ? wallpaperLoader : settings
     readonly property int trayMaxHeight: Math.round(screen.height * 0.75)
-    readonly property real trayHeight: Math.min(tabRow.implicitHeight + 16 + trayPage.implicitHeight + 2 * trayPadding, trayMaxHeight)
+    readonly property real trayHeight: Math.min((trayTab === "wallpapers" ? 0 : tabRow.implicitHeight + 16) + trayPage.implicitHeight + 2 * trayPadding, trayMaxHeight)
 
     onTrayOpenChanged: {
         if (trayOpen) {
@@ -414,6 +414,7 @@ Scope {
 
                 x: bar.trayPadding
                 y: bar.trayPadding - 8
+                z: 1
                 spacing: 4
 
                 Repeater {
@@ -438,7 +439,7 @@ Scope {
 
                 anchors.fill: parent
                 anchors.margins: bar.trayPadding
-                anchors.topMargin: tabRow.y + tabRow.implicitHeight + 16
+                anchors.topMargin: bar.trayTab === "wallpapers" ? tabRow.y : tabRow.y + tabRow.implicitHeight + 16
                 contentWidth: width
                 contentHeight: bar.trayPage.implicitHeight
                 interactive: false
@@ -461,17 +462,18 @@ Scope {
 
                     sourceComponent: WallpaperTray {
                         width: trayFlick.width
+                        leftInset: tabRow.width + 16
                     }
                 }
             }
 
             IconButton {
-                anchors.top: parent.top
+                anchors.verticalCenter: tabRow.verticalCenter
                 anchors.right: parent.right
-                anchors.margins: 8
+                anchors.rightMargin: bar.trayPadding - 4
                 icon: Icons.close
                 iconSize: Theme.fontSize + 2
-                implicitHeight: 28
+                implicitHeight: 30
                 foreground: Theme.fgMuted
                 onClicked: Dropdowns.close()
             }

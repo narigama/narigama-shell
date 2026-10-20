@@ -6,6 +6,7 @@ import qs.services
 BarButton {
     icon: Notifications.dnd ? Icons.bellOff : Notifications.count > 0 ? Icons.bellBadge : Icons.bell
     label: String(Notifications.count)
+    rollLabel: true
     color: Theme.green
     leftDropdown: "notifications"
 

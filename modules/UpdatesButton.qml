@@ -7,6 +7,7 @@ import qs.services
 BarButton {
     icon: Icons.packageUp
     label: String(SystemHealth.updates.length)
+    rollLabel: true
     color: Theme.yellow
     leftDropdown: "updates"
 }

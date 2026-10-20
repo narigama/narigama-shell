@@ -31,13 +31,46 @@ ColumnLayout {
         spacing: 16
 
         Rectangle {
+            id: artBox
+
+            readonly property string rawUrl: root.player?.trackArtUrl ?? ""
+            property string shownUrl: ""
+            property string prevUrl: ""
+
             Layout.preferredWidth: 96
             Layout.preferredHeight: 96
             color: Theme.elevated
 
+            onRawUrlChanged: {
+                if (rawUrl === "") {
+                    clearArtTimer.restart();
+                    return;
+                }
+
+                clearArtTimer.stop();
+
+                if (rawUrl !== shownUrl) {
+                    prevUrl = shownUrl;
+                    shownUrl = rawUrl;
+                }
+            }
+
+            Component.onCompleted: shownUrl = rawUrl
+
+            // Players briefly clear trackArtUrl between tracks; wait before dropping the cover.
+            Timer {
+                id: clearArtTimer
+
+                interval: 200
+                onTriggered: {
+                    artBox.prevUrl = "";
+                    artBox.shownUrl = "";
+                }
+            }
+
             StyledText {
                 anchors.centerIn: parent
-                visible: art.status !== Image.Ready
+                visible: art.status !== Image.Ready && prevArt.status !== Image.Ready
                 text: Icons.forPlayer(root.player)
                 font.family: Theme.iconFontFamily
                 color: Theme.blue
@@ -45,37 +78,62 @@ ColumnLayout {
             }
 
             Image {
-                id: art
+                id: prevArt
 
                 anchors.fill: parent
-                source: root.player?.trackArtUrl ?? ""
+                source: artBox.prevUrl
                 fillMode: Image.PreserveAspectCrop
                 asynchronous: true
                 sourceSize: Qt.size(192, 192)
             }
+
+            Image {
+                id: art
+
+                anchors.fill: parent
+                source: artBox.shownUrl
+                fillMode: Image.PreserveAspectCrop
+                asynchronous: true
+                sourceSize: Qt.size(192, 192)
+                opacity: status === Image.Ready ? 1 : 0
+
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: 200
+                        easing.type: Easing.OutCubic
+                    }
+                }
+            }
         }
 
         ColumnLayout {
+            readonly property string trackKey: `${root.player?.trackTitle ?? ""}\n${root.player?.trackArtist ?? ""}\n${root.player?.trackAlbum ?? ""}`
+
             Layout.fillWidth: true
             spacing: 4
 
-            StyledText {
+            RollingText {
                 Layout.fillWidth: true
                 text: root.player?.trackTitle || "Unknown title"
+                trigger: parent.trackKey
                 color: Theme.blue
-                font.bold: true
-                font.pixelSize: Theme.fontSize + 2
+                bold: true
+                pixelSize: Theme.fontSize + 2
             }
 
-            StyledText {
+            RollingText {
                 Layout.fillWidth: true
                 text: root.player?.trackArtist || "Unknown artist"
+                trigger: parent.trackKey
+                delay: 75
             }
 
-            StyledText {
+            RollingText {
                 Layout.fillWidth: true
                 visible: text !== ""
                 text: root.player?.trackAlbum ?? ""
+                trigger: parent.trackKey
+                delay: 150
                 color: Theme.fgMuted
             }
 

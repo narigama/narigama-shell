@@ -19,6 +19,11 @@ Singleton {
     property bool checkingUpdates: false
     property double updatesCheckedAt: 0
 
+    // Commits on @{u} not yet in the shell's own checkout.
+    property int shellUpdates: 0
+    property bool updatingShell: false
+    property bool shellUpdateFailed: false
+
     // [{ unit, description, user }]
     property var failedUnits: []
 
@@ -45,6 +50,20 @@ Singleton {
 
         checkingUpdates = true;
         updatesQuery.running = true;
+    }
+
+    function checkShellUpdates() {
+        if (!updatingShell)
+            shellCheckQuery.running = true;
+    }
+
+    function updateShell() {
+        if (updatingShell)
+            return;
+
+        updatingShell = true;
+        shellUpdateFailed = false;
+        shellPull.running = true;
     }
 
     function refreshFailedUnits() {
@@ -77,7 +96,10 @@ Singleton {
         running: Tools.ready
         repeat: true
         triggeredOnStart: true
-        onTriggered: root.checkUpdates()
+        onTriggered: {
+            root.checkUpdates();
+            root.checkShellUpdates();
+        }
     }
 
     Process {
@@ -145,6 +167,31 @@ Singleton {
                 });
                 root.checkingUpdates = false;
                 root.updatesCheckedAt = Date.now();
+            }
+        }
+    }
+
+    Process {
+        id: shellCheckQuery
+
+        command: ["sh", "-c", "git -C \"$1\" fetch --quiet && git -C \"$1\" rev-list --count HEAD..@{u}", "sh", Quickshell.shellDir]
+        stdout: StdioCollector {
+            onStreamFinished: root.shellUpdates = Number(text.trim()) || 0
+        }
+    }
+
+    Process {
+        id: shellPull
+
+        command: ["git", "-C", Quickshell.shellDir, "pull", "--ff-only", "--quiet"]
+        onExited: code => {
+            root.updatingShell = false;
+
+            if (code === 0) {
+                root.shellUpdates = 0;
+                Osd.show(Icons.check, "Shell updated", -1, Theme.green);
+            } else {
+                root.shellUpdateFailed = true;
             }
         }
     }

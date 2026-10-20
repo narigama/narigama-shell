@@ -12,6 +12,7 @@ ColumnLayout {
 
     // Screen names to apply to; empty means all.
     property var targets: []
+    property real leftInset: 0
     readonly property int thumbHeight: 180
     readonly property int thumbWidth: 320
     readonly property int thumbGap: 12
@@ -22,7 +23,12 @@ ColumnLayout {
 
     RowLayout {
         Layout.fillWidth: true
+        Layout.preferredHeight: 30
         spacing: 8
+
+        Item {
+            Layout.preferredWidth: root.leftInset
+        }
 
         StyledText {
             text: "Apply to"
@@ -91,16 +97,17 @@ ColumnLayout {
             Layout.fillWidth: true
         }
 
-        StyledText {
+        RollingText {
             text: Wallpapers.scanning ? "Making thumbnails…" : Wallpapers.wallpapers.length + " images"
             color: Theme.fgSubtle
-            font.pixelSize: Theme.fontSize - 2
+            pixelSize: Theme.fontSize - 2
         }
 
         TextField {
             id: folder
 
-            Layout.preferredWidth: 360
+            Layout.preferredWidth: 320
+            implicitHeight: 28
             text: Wallpapers.folder
             placeholder: "Wallpaper folder"
             onAccepted: setFolder.clicked()
@@ -110,6 +117,7 @@ ColumnLayout {
             id: setFolder
 
             text: "Set"
+            implicitHeight: 26
             foreground: Theme.primary
             enabled: folder.text.trim() !== "" && folder.text.trim() !== Wallpapers.folder
             onClicked: ShellState.wallpaperDir = folder.text.trim().replace(/\/$/, "")

@@ -97,7 +97,7 @@ ColumnLayout {
                 color: Theme.fgMuted
             }
 
-            StyledText {
+            RollingText {
                 text: "Up " + root.formatUptime(root.uptimeSeconds)
                 color: Theme.fgMuted
             }
@@ -126,6 +126,18 @@ ColumnLayout {
             foreground: Theme.primary
             background: Theme.surface
             onClicked: Dropdowns.current = "wallpapers"
+        }
+
+        IconButton {
+            visible: SystemHealth.shellUpdates > 0 || SystemHealth.updatingShell || SystemHealth.shellUpdateFailed
+            Layout.columnSpan: 2
+            Layout.fillWidth: true
+            icon: Icons.packageUp
+            text: SystemHealth.updatingShell ? "Updating shell…" : SystemHealth.shellUpdateFailed ? "Shell update failed" : "Update shell (" + SystemHealth.shellUpdates + " new)"
+            foreground: SystemHealth.shellUpdateFailed ? Theme.red : Theme.yellow
+            background: Theme.surface
+            enabled: !SystemHealth.updatingShell
+            onClicked: SystemHealth.updateShell()
         }
     }
 

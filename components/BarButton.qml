@@ -13,6 +13,7 @@ Item {
     property color iconColor: color
     property int iconSize: Theme.iconSize
     property bool labelShow: true
+    property bool rollLabel: false
     // Dropdown names (see modules/DropdownHost.qml) opened by left/right click.
     property string leftDropdown: ""
     property string rightDropdown: ""
@@ -74,12 +75,20 @@ Item {
 
         Text {
             anchors.verticalCenter: parent.verticalCenter
-            visible: root.labelShow && root.label !== ""
+            visible: root.labelShow && root.label !== "" && !root.rollLabel
             text: root.label
             color: root.color
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSize
             font.bold: true
+        }
+
+        RollingText {
+            anchors.verticalCenter: parent.verticalCenter
+            visible: root.labelShow && root.label !== "" && root.rollLabel
+            text: root.label
+            color: root.color
+            bold: true
         }
     }
 

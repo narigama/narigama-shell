@@ -13,12 +13,17 @@ RowLayout {
     spacing: 8
 
     StyledText {
-        Layout.fillWidth: true
         text: root.text.toUpperCase()
-        color: Theme.fgMuted
+        color: Theme.primary
         font.pixelSize: Theme.fontSize - 2
         font.bold: true
         font.letterSpacing: 1
+    }
+
+    Rectangle {
+        Layout.fillWidth: true
+        implicitHeight: 1
+        color: Theme.elevated
     }
 
     Row {

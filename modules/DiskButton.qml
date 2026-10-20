@@ -8,6 +8,7 @@ BarButton {
 
     icon: Icons.harddisk
     label: Math.round(percent) + "%"
+    rollLabel: true
     color: percent >= 90 ? Theme.red : percent >= 75 ? Theme.yellow : Theme.blue
     leftDropdown: "disk"
 }

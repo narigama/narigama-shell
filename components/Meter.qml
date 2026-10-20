@@ -14,5 +14,12 @@ Rectangle {
         width: Math.max(0, Math.min(1, parent.value)) * parent.width
         height: parent.height
         color: parent.accent
+
+        Behavior on width {
+            NumberAnimation {
+                duration: 220
+                easing.type: Easing.OutCubic
+            }
+        }
     }
 }
