@@ -32,7 +32,7 @@ A [Quickshell](https://quickshell.org) status bar and desktop shell for Wayland 
 - Privacy indicator for apps using the microphone, camera or screen share.
 - Workspace tabs that pulse when a window asks for attention.
 - A full-width tray the bar slides away from its edge to reveal, with tabs for settings and wallpapers. The wallpaper carousel pans with the pointer, applies to all monitors or chosen ones (awww, or swaybg as a fallback), and can derive the shell's colours from the wallpaper with matugen.
-- 20 themes (10 dark, 10 light), font pickers, and numeric, Arabic, Roman, Japanese or custom workspace labels.
+- 40 themes (20 dark, 20 light), font pickers, and numeric, Arabic, Roman, Japanese or custom workspace labels.
 
 ## Requirements
 

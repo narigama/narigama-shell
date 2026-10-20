@@ -200,6 +200,196 @@ Singleton {
             }
         },
         {
+            "id": "rose-pine",
+            "name": "Rosé Pine",
+            "kitty": "Rosé Pine",
+            "light": false,
+            "colors": {
+                "bg": "#191724",
+                "surface": "#1f1d2e",
+                "elevated": "#26233a",
+                "fg": "#e0def4",
+                "fgMuted": "#908caa",
+                "fgSubtle": "#6e6a86",
+                "primary": "#c4a7e7",
+                "red": "#eb6f92",
+                "yellow": "#f6c177",
+                "green": "#31748f",
+                "blue": "#9ccfd8"
+            }
+        },
+        {
+            "id": "github-dark",
+            "name": "GitHub Dark",
+            "kitty": "GitHub Dark",
+            "light": false,
+            "colors": {
+                "bg": "#0d1117",
+                "surface": "#161b22",
+                "elevated": "#21262d",
+                "fg": "#e6edf3",
+                "fgMuted": "#8b949e",
+                "fgSubtle": "#484f58",
+                "primary": "#bc8cff",
+                "red": "#ff7b72",
+                "yellow": "#d29922",
+                "green": "#3fb950",
+                "blue": "#58a6ff"
+            }
+        },
+        {
+            "id": "monokai",
+            "name": "Monokai",
+            "kitty": "Monokai",
+            "light": false,
+            "colors": {
+                "bg": "#1e1f1c",
+                "surface": "#272822",
+                "elevated": "#3e3d32",
+                "fg": "#f8f8f2",
+                "fgMuted": "#a59f85",
+                "fgSubtle": "#75715e",
+                "primary": "#ae81ff",
+                "red": "#f92672",
+                "yellow": "#e6db74",
+                "green": "#a6e22e",
+                "blue": "#66d9ef"
+            }
+        },
+        {
+            "id": "ayu-mirage",
+            "name": "Ayu Mirage",
+            "kitty": "Ayu Mirage",
+            "light": false,
+            "colors": {
+                "bg": "#171b24",
+                "surface": "#1f2430",
+                "elevated": "#2b3240",
+                "fg": "#d9d7ce",
+                "fgMuted": "#707a8c",
+                "fgSubtle": "#505766",
+                "primary": "#73d0ff",
+                "red": "#f28779",
+                "yellow": "#ffcc66",
+                "green": "#bae67e",
+                "blue": "#95e6cb"
+            }
+        },
+        {
+            "id": "flexoki-dark",
+            "name": "Flexoki Dark",
+            "kitty": "Flexoki (Dark)",
+            "light": false,
+            "colors": {
+                "bg": "#100f0f",
+                "surface": "#1c1b1a",
+                "elevated": "#282726",
+                "fg": "#cecdc3",
+                "fgMuted": "#878580",
+                "fgSubtle": "#575653",
+                "primary": "#4385be",
+                "red": "#d14d41",
+                "yellow": "#d0a215",
+                "green": "#879a39",
+                "blue": "#3aa99f"
+            }
+        },
+        {
+            "id": "selenized-dark",
+            "name": "Selenized Dark",
+            "kitty": "Selenized Dark",
+            "light": false,
+            "colors": {
+                "bg": "#103c48",
+                "surface": "#184956",
+                "elevated": "#2d5b69",
+                "fg": "#adbcbc",
+                "fgMuted": "#72898f",
+                "fgSubtle": "#48707a",
+                "primary": "#4695f7",
+                "red": "#fa5750",
+                "yellow": "#dbb32d",
+                "green": "#75b938",
+                "blue": "#41c7b9"
+            }
+        },
+        {
+            "id": "tomorrow-night",
+            "name": "Tomorrow Night",
+            "kitty": "Tomorrow Night",
+            "light": false,
+            "colors": {
+                "bg": "#161719",
+                "surface": "#1d1f21",
+                "elevated": "#282a2e",
+                "fg": "#c5c8c6",
+                "fgMuted": "#969896",
+                "fgSubtle": "#666968",
+                "primary": "#81a2be",
+                "red": "#cc6666",
+                "yellow": "#f0c674",
+                "green": "#b5bd68",
+                "blue": "#8abeb7"
+            }
+        },
+        {
+            "id": "zenbones-dark",
+            "name": "Zenbones Dark",
+            "kitty": "zenbones_dark",
+            "light": false,
+            "colors": {
+                "bg": "#161412",
+                "surface": "#1c1917",
+                "elevated": "#2c2623",
+                "fg": "#b4bdc3",
+                "fgMuted": "#888f94",
+                "fgSubtle": "#5c534d",
+                "primary": "#6099c0",
+                "red": "#de6e7c",
+                "yellow": "#b77e64",
+                "green": "#819b69",
+                "blue": "#66a5ad"
+            }
+        },
+        {
+            "id": "modus-vivendi",
+            "name": "Modus Vivendi",
+            "kitty": "Modus Vivendi",
+            "light": false,
+            "colors": {
+                "bg": "#000000",
+                "surface": "#1e1e1e",
+                "elevated": "#303030",
+                "fg": "#ffffff",
+                "fgMuted": "#989898",
+                "fgSubtle": "#595959",
+                "primary": "#79a8ff",
+                "red": "#ff5f59",
+                "yellow": "#d0bc00",
+                "green": "#44bc44",
+                "blue": "#00d3d0"
+            }
+        },
+        {
+            "id": "alabaster-dark",
+            "name": "Alabaster Dark",
+            "kitty": "Alabaster Dark",
+            "light": false,
+            "colors": {
+                "bg": "#0e1415",
+                "surface": "#162022",
+                "elevated": "#293334",
+                "fg": "#cecece",
+                "fgMuted": "#8b9496",
+                "fgSubtle": "#586264",
+                "primary": "#4a88e4",
+                "red": "#e25d56",
+                "yellow": "#e9bf57",
+                "green": "#73ca50",
+                "blue": "#23acdd"
+            }
+        },
+        {
             "id": "catppuccin-latte",
             "name": "Catppuccin Latte",
             "kitty": "Catppuccin-Latte",
@@ -387,6 +577,196 @@ Singleton {
                 "yellow": "#cc6d00",
                 "green": "#6f894e",
                 "blue": "#4d699b"
+            }
+        },
+        {
+            "id": "ayu-light",
+            "name": "Ayu Light",
+            "kitty": "Ayu Light",
+            "light": true,
+            "colors": {
+                "bg": "#f3f4f5",
+                "surface": "#fafafa",
+                "elevated": "#e7e8e9",
+                "fg": "#5b6673",
+                "fgMuted": "#828c99",
+                "fgSubtle": "#abb2b9",
+                "primary": "#41a6d9",
+                "red": "#f07171",
+                "yellow": "#f19618",
+                "green": "#86b200",
+                "blue": "#4cbe99"
+            }
+        },
+        {
+            "id": "flexoki-light",
+            "name": "Flexoki Light",
+            "kitty": "Flexoki (Light)",
+            "light": true,
+            "colors": {
+                "bg": "#f2f0e5",
+                "surface": "#fffcf0",
+                "elevated": "#e6e4d9",
+                "fg": "#100f0f",
+                "fgMuted": "#6f6e69",
+                "fgSubtle": "#b7b5ac",
+                "primary": "#205ea6",
+                "red": "#af3029",
+                "yellow": "#ad8301",
+                "green": "#66800b",
+                "blue": "#24837b"
+            }
+        },
+        {
+            "id": "selenized-light",
+            "name": "Selenized Light",
+            "kitty": "Selenized Light",
+            "light": true,
+            "colors": {
+                "bg": "#ece3cc",
+                "surface": "#fbf3db",
+                "elevated": "#d5cdb6",
+                "fg": "#53676d",
+                "fgMuted": "#909995",
+                "fgSubtle": "#b8beb6",
+                "primary": "#0072d4",
+                "red": "#d2212d",
+                "yellow": "#ad8900",
+                "green": "#489100",
+                "blue": "#009c8f"
+            }
+        },
+        {
+            "id": "tomorrow",
+            "name": "Tomorrow",
+            "kitty": "Tomorrow",
+            "light": true,
+            "colors": {
+                "bg": "#f2f2f2",
+                "surface": "#ffffff",
+                "elevated": "#e0e0e0",
+                "fg": "#4d4d4c",
+                "fgMuted": "#8e908c",
+                "fgSubtle": "#b4b7b4",
+                "primary": "#4271ae",
+                "red": "#c82829",
+                "yellow": "#eab700",
+                "green": "#718c00",
+                "blue": "#3e999f"
+            }
+        },
+        {
+            "id": "zenbones-light",
+            "name": "Zenbones Light",
+            "kitty": "zenbones_light",
+            "light": true,
+            "colors": {
+                "bg": "#e4dfdc",
+                "surface": "#f0edec",
+                "elevated": "#d6cdc9",
+                "fg": "#2c363c",
+                "fgMuted": "#6e787e",
+                "fgSubtle": "#a8a19d",
+                "primary": "#286486",
+                "red": "#a8334c",
+                "yellow": "#944927",
+                "green": "#4f6c31",
+                "blue": "#3b8992"
+            }
+        },
+        {
+            "id": "modus-operandi",
+            "name": "Modus Operandi",
+            "kitty": "Modus Operandi",
+            "light": true,
+            "colors": {
+                "bg": "#f2f2f2",
+                "surface": "#ffffff",
+                "elevated": "#dfdfdf",
+                "fg": "#000000",
+                "fgMuted": "#595959",
+                "fgSubtle": "#9f9f9f",
+                "primary": "#0031a9",
+                "red": "#a60000",
+                "yellow": "#6f5500",
+                "green": "#006800",
+                "blue": "#005e8b"
+            }
+        },
+        {
+            "id": "alabaster",
+            "name": "Alabaster",
+            "kitty": "Alabaster",
+            "light": true,
+            "colors": {
+                "bg": "#eeeeee",
+                "surface": "#f7f7f7",
+                "elevated": "#dedede",
+                "fg": "#000000",
+                "fgMuted": "#777777",
+                "fgSubtle": "#aaaaaa",
+                "primary": "#325cc0",
+                "red": "#aa3731",
+                "yellow": "#cb9000",
+                "green": "#448c37",
+                "blue": "#0083b2"
+            }
+        },
+        {
+            "id": "adwaita-light",
+            "name": "Adwaita Light",
+            "kitty": "Adwaita light",
+            "light": true,
+            "colors": {
+                "bg": "#f2f1f0",
+                "surface": "#fcfcfc",
+                "elevated": "#deddda",
+                "fg": "#3d3846",
+                "fgMuted": "#77767b",
+                "fgSubtle": "#b0afac",
+                "primary": "#1c71d8",
+                "red": "#e01b24",
+                "yellow": "#e66100",
+                "green": "#2ec27e",
+                "blue": "#1a9a86"
+            }
+        },
+        {
+            "id": "dawnfox",
+            "name": "Dawnfox",
+            "kitty": "Dawnfox",
+            "light": true,
+            "colors": {
+                "bg": "#ebe5df",
+                "surface": "#faf4ed",
+                "elevated": "#d0d8d8",
+                "fg": "#575279",
+                "fgMuted": "#797593",
+                "fgSubtle": "#9893a5",
+                "primary": "#286983",
+                "red": "#b4637a",
+                "yellow": "#ea9d34",
+                "green": "#618774",
+                "blue": "#56949f"
+            }
+        },
+        {
+            "id": "bluloco-light",
+            "name": "Bluloco Light",
+            "kitty": "Bluloco Light",
+            "light": true,
+            "colors": {
+                "bg": "#f0f0f0",
+                "surface": "#f9f9f9",
+                "elevated": "#e2e2e2",
+                "fg": "#373a41",
+                "fgMuted": "#676a77",
+                "fgSubtle": "#a0a1a7",
+                "primary": "#275fe4",
+                "red": "#d52753",
+                "yellow": "#df631c",
+                "green": "#23974a",
+                "blue": "#0099e1"
             }
         }
     ]
