@@ -5,7 +5,7 @@ import qs.config
 
 BarButton {
     icon: Icons.calendarClock
-    label: Qt.formatDateTime(clock.date, ShellState.timeFormat)
+    label: Qt.formatDateTime(clock.date, ShellState.timeFormat) + (ShellState.clockOffset ? " · " + Qt.formatDateTime(new Date(clock.date.getTime() + ShellState.clockOffset * 60000), ShellState.timeFormat) : "")
     color: Theme.primary
     leftDropdown: "calendar"
     rightDropdown: "weather"

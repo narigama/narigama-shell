@@ -297,6 +297,18 @@ GridLayout {
             }
         }
 
+        SettingRow {
+            label: "Secondary offset"
+
+            Stepper {
+                value: Math.max(0, ShellState.clockOffsets.findIndex(m => m >= ShellState.clockOffset))
+                from: 0
+                to: ShellState.clockOffsets.length - 1
+                text: ShellState.formatOffset(ShellState.clockOffset)
+                onChanged: value => ShellState.clockOffset = ShellState.clockOffsets[value]
+            }
+        }
+
         SectionHeader {
             Layout.topMargin: 16
             text: "Launcher"

@@ -10,6 +10,7 @@ Row {
     property int to: 100
     property int step: 1
     property string suffix
+    property string text: value + suffix
 
     signal changed(int value)
 
@@ -24,9 +25,9 @@ Row {
 
     StyledText {
         anchors.verticalCenter: parent.verticalCenter
-        width: 48
+        width: Math.max(48, implicitWidth)
         horizontalAlignment: Text.AlignHCenter
-        text: root.value + root.suffix
+        text: root.text
         font.bold: true
     }
 

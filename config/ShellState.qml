@@ -8,7 +8,7 @@ import Quickshell.Io
 Singleton {
     id: root
 
-    readonly property var keys: ["notificationsDnd", "theme", "lastDarkTheme", "lastLightTheme", "themeModeToApps", "fontFamily", "iconFontFamily", "fontSize", "iconSize", "hiddenModules", "clockSeconds", "clock24h", "weatherLocation", "popupSeconds", "popupMax", "osdEnabled", "workspaceLabels", "workspaceCustomLabels", "mutedApps", "barPosition", "popupPosition", "barLayout", "captureAnnotate", "captureAudio", "wallpaper", "wallpaperDir", "matchWallpaper", "wallpaperThemeMode", "wallpaperColors", "lockOnIdle", "lockIdleMinutes", "lockBeforeSleep", "lockBackground", "lockEffect", "lockEffectStrength", "lockShowNotifications", "launcherPosition", "launcherDisabled"]
+    readonly property var keys: ["notificationsDnd", "theme", "lastDarkTheme", "lastLightTheme", "themeModeToApps", "fontFamily", "iconFontFamily", "fontSize", "iconSize", "hiddenModules", "clockSeconds", "clock24h", "clockOffset", "weatherLocation", "popupSeconds", "popupMax", "osdEnabled", "workspaceLabels", "workspaceCustomLabels", "mutedApps", "barPosition", "popupPosition", "barLayout", "captureAnnotate", "captureAudio", "wallpaper", "wallpaperDir", "matchWallpaper", "wallpaperThemeMode", "wallpaperColors", "lockOnIdle", "lockIdleMinutes", "lockBeforeSleep", "lockBackground", "lockEffect", "lockEffectStrength", "lockShowNotifications", "launcherPosition", "launcherDisabled"]
 
     property bool notificationsDnd: false
 
@@ -28,6 +28,9 @@ Singleton {
     property var hiddenModules: ["capture", "idleInhibit", "colorPicker", "clipboard", "failedUnits", "brightness", "updates", "gamemode", "themeMode"]
     property bool clockSeconds: true
     property bool clock24h: true
+    // Secondary clock offset in minutes (0 = off); steps through all world UTC offsets (-12:00 to +14:00).
+    property int clockOffset: 0
+    readonly property var clockOffsets: [-720, -660, -600, -570, -540, -480, -420, -360, -300, -240, -210, -180, -150, -120, -60, 0, 60, 120, 180, 210, 240, 270, 300, 330, 345, 360, 390, 420, 480, 525, 540, 570, 600, 630, 660, 720, 765, 780, 825, 840]
     // Empty until set; the weather module stays hidden meanwhile.
     property string weatherLocation: ""
     property int popupSeconds: 5
@@ -133,6 +136,15 @@ Singleton {
             theme = Theme.light ? lastDarkTheme : lastLightTheme;
     }
 
+    function formatOffset(minutes) {
+        if (!minutes)
+            return "0:00";
+
+        const abs = Math.abs(minutes);
+
+        return (minutes > 0 ? "+" : "-") + Math.floor(abs / 60) + ":" + String(abs % 60).padStart(2, "0");
+    }
+
     function moduleLabel(name) {
         return (modules.find(m => m[0] === name) ?? [name, name])[1];
     }
@@ -192,6 +204,7 @@ Singleton {
     onHiddenModulesChanged: save()
     onClockSecondsChanged: save()
     onClock24hChanged: save()
+    onClockOffsetChanged: save()
     onWeatherLocationChanged: save()
     onPopupSecondsChanged: save()
     onPopupMaxChanged: save()
