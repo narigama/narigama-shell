@@ -10,6 +10,7 @@ Singleton {
     readonly property bool light: fromWallpaper ? ShellState.wallpaperThemeMode === "light" : current.light
     // callLater coalesces a theme change that also moves lastDark/LightTheme into one run.
     onLightChanged: Qt.callLater(applyToApps)
+    onColorsChanged: Qt.callLater(applyToApps)
     Component.onCompleted: Qt.callLater(applyToApps)
 
     Connections {
@@ -24,14 +25,49 @@ Singleton {
         }
     }
 
+    function kittyConf(c, isLight) {
+        return [
+            "foreground " + c.fg,
+            "background " + c.bg,
+            "selection_foreground " + c.fg,
+            "selection_background " + c.elevated,
+            "cursor " + c.fg,
+            "cursor_text_color " + c.bg,
+            "url_color " + c.primary,
+            "active_tab_foreground " + c.fg,
+            "active_tab_background " + c.elevated,
+            "inactive_tab_foreground " + c.fgMuted,
+            "inactive_tab_background " + c.surface,
+            "color0 " + (isLight ? c.fg : c.bg),
+            "color8 " + c.fgMuted,
+            "color1 " + c.red,
+            "color9 " + c.red,
+            "color2 " + c.green,
+            "color10 " + c.green,
+            "color3 " + c.yellow,
+            "color11 " + c.yellow,
+            "color4 " + c.primary,
+            "color12 " + c.primary,
+            "color5 " + c.primary,
+            "color13 " + c.primary,
+            "color6 " + c.blue,
+            "color14 " + c.blue,
+            "color7 " + c.fg,
+            "color15 " + c.fg
+        ].join("\n") + "\n";
+    }
+
     // kitty picks dark-/light-theme.auto.conf from the portal color-scheme, so both are kept
     // written before the scheme flips; USR1 makes running kittys reload a same-mode theme change.
+    // text_fg_override_threshold lives in kitty.conf (auto.conf only parses colour keys) and keeps
+    // 24-bit RGB text from dark-themed TUIs readable on light backgrounds.
     // gtk-theme before color-scheme: Electron apps (Slack) re-derive the scheme from a gtk-theme change and land on light.
-    readonly property string appsScript: 'if command -v kitten >/dev/null; then
+    readonly property string appsScript: 'if command -v kitty >/dev/null; then
     dir="${XDG_CONFIG_HOME:-$HOME/.config}/kitty"
-    kitten themes --dump-theme --cache-age=30 "$3" > "$dir/dark-theme.auto.conf.tmp" && mv "$dir/dark-theme.auto.conf.tmp" "$dir/dark-theme.auto.conf"
-    kitten themes --dump-theme --cache-age=30 "$4" > "$dir/light-theme.auto.conf.tmp" && mv "$dir/light-theme.auto.conf.tmp" "$dir/light-theme.auto.conf"
-    rm -f "$dir"/*-theme.auto.conf.tmp
+    mkdir -p "$dir"
+    grep -q "^text_fg_override_threshold" "$dir/kitty.conf" 2>/dev/null || printf "\ntext_fg_override_threshold 4.5 ratio\n" >> "$dir/kitty.conf"
+    printf "%s" "$3" > "$dir/dark-theme.auto.conf.tmp" && mv "$dir/dark-theme.auto.conf.tmp" "$dir/dark-theme.auto.conf"
+    printf "%s" "$4" > "$dir/light-theme.auto.conf.tmp" && mv "$dir/light-theme.auto.conf.tmp" "$dir/light-theme.auto.conf"
     pkill -USR1 -x kitty
 fi
 gsettings set org.gnome.desktop.interface gtk-theme "$1" && gsettings set org.gnome.desktop.interface color-scheme "$2"'
@@ -40,7 +76,10 @@ gsettings set org.gnome.desktop.interface gtk-theme "$1" && gsettings set org.gn
         if (!ShellState.themeModeToApps)
             return;
 
-        Quickshell.execDetached(["sh", "-c", appsScript, "sh", light ? "Adwaita" : "Adwaita-dark", light ? "prefer-light" : "prefer-dark", Themes.find(ShellState.lastDarkTheme).kitty, Themes.find(ShellState.lastLightTheme).kitty]);
+        const darkColors = fromWallpaper && !light ? ShellState.wallpaperColors : Themes.find(ShellState.lastDarkTheme).colors;
+        const lightColors = fromWallpaper && light ? ShellState.wallpaperColors : Themes.find(ShellState.lastLightTheme).colors;
+
+        Quickshell.execDetached(["sh", "-c", appsScript, "sh", light ? "Adwaita" : "Adwaita-dark", light ? "prefer-light" : "prefer-dark", kittyConf(darkColors, false), kittyConf(lightColors, true)]);
     }
 
     readonly property var colors: fromWallpaper ? ShellState.wallpaperColors : current.colors

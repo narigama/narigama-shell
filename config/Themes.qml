@@ -6,13 +6,11 @@ import Quickshell
 // Colour schemes: the ten most-starred theme families on GitHub (Sep 2026) plus official
 // light variants. Slots: bg (dropdowns), surface (bar), elevated (hover/tracks), fg,
 // fgMuted, fgSubtle, primary (accent), red, yellow, green, blue (the cyan/teal accent).
-// kitty: the matching name in `kitten themes`.
 Singleton {
     readonly property var list: [
         {
             "id": "nightfox",
             "name": "Nightfox",
-            "kitty": "Nightfox",
             "light": false,
             "colors": {
                 "bg": "#131a24",
@@ -31,7 +29,6 @@ Singleton {
         {
             "id": "dracula",
             "name": "Dracula",
-            "kitty": "Dracula",
             "light": false,
             "colors": {
                 "bg": "#21222c",
@@ -50,7 +47,6 @@ Singleton {
         {
             "id": "catppuccin-mocha",
             "name": "Catppuccin Mocha",
-            "kitty": "Catppuccin-Mocha",
             "light": false,
             "colors": {
                 "bg": "#181825",
@@ -69,7 +65,6 @@ Singleton {
         {
             "id": "solarized-dark",
             "name": "Solarized Dark",
-            "kitty": "Solarized Dark",
             "light": false,
             "colors": {
                 "bg": "#002b36",
@@ -88,7 +83,6 @@ Singleton {
         {
             "id": "gruvbox-dark",
             "name": "Gruvbox Dark",
-            "kitty": "Gruvbox Dark",
             "light": false,
             "colors": {
                 "bg": "#1d2021",
@@ -107,7 +101,6 @@ Singleton {
         {
             "id": "tokyonight",
             "name": "Tokyo Night",
-            "kitty": "Tokyo Night",
             "light": false,
             "colors": {
                 "bg": "#16161e",
@@ -126,7 +119,6 @@ Singleton {
         {
             "id": "nord",
             "name": "Nord",
-            "kitty": "Nord",
             "light": false,
             "colors": {
                 "bg": "#2e3440",
@@ -145,7 +137,6 @@ Singleton {
         {
             "id": "kanagawa",
             "name": "Kanagawa",
-            "kitty": "kanagawa",
             "light": false,
             "colors": {
                 "bg": "#16161d",
@@ -164,7 +155,6 @@ Singleton {
         {
             "id": "everforest-dark",
             "name": "Everforest Dark",
-            "kitty": "Everforest Dark Medium",
             "light": false,
             "colors": {
                 "bg": "#232a2e",
@@ -183,7 +173,6 @@ Singleton {
         {
             "id": "onedark",
             "name": "One Dark",
-            "kitty": "One Dark",
             "light": false,
             "colors": {
                 "bg": "#21252b",
@@ -202,7 +191,6 @@ Singleton {
         {
             "id": "rose-pine",
             "name": "Rosé Pine",
-            "kitty": "Rosé Pine",
             "light": false,
             "colors": {
                 "bg": "#191724",
@@ -221,7 +209,6 @@ Singleton {
         {
             "id": "github-dark",
             "name": "GitHub Dark",
-            "kitty": "GitHub Dark",
             "light": false,
             "colors": {
                 "bg": "#0d1117",
@@ -240,7 +227,6 @@ Singleton {
         {
             "id": "monokai",
             "name": "Monokai",
-            "kitty": "Monokai",
             "light": false,
             "colors": {
                 "bg": "#1e1f1c",
@@ -259,7 +245,6 @@ Singleton {
         {
             "id": "ayu-mirage",
             "name": "Ayu Mirage",
-            "kitty": "Ayu Mirage",
             "light": false,
             "colors": {
                 "bg": "#171b24",
@@ -278,7 +263,6 @@ Singleton {
         {
             "id": "flexoki-dark",
             "name": "Flexoki Dark",
-            "kitty": "Flexoki (Dark)",
             "light": false,
             "colors": {
                 "bg": "#100f0f",
@@ -297,7 +281,6 @@ Singleton {
         {
             "id": "selenized-dark",
             "name": "Selenized Dark",
-            "kitty": "Selenized Dark",
             "light": false,
             "colors": {
                 "bg": "#103c48",
@@ -316,7 +299,6 @@ Singleton {
         {
             "id": "tomorrow-night",
             "name": "Tomorrow Night",
-            "kitty": "Tomorrow Night",
             "light": false,
             "colors": {
                 "bg": "#161719",
@@ -335,7 +317,6 @@ Singleton {
         {
             "id": "zenbones-dark",
             "name": "Zenbones Dark",
-            "kitty": "zenbones_dark",
             "light": false,
             "colors": {
                 "bg": "#161412",
@@ -354,7 +335,6 @@ Singleton {
         {
             "id": "modus-vivendi",
             "name": "Modus Vivendi",
-            "kitty": "Modus Vivendi",
             "light": false,
             "colors": {
                 "bg": "#000000",
@@ -373,7 +353,6 @@ Singleton {
         {
             "id": "alabaster-dark",
             "name": "Alabaster Dark",
-            "kitty": "Alabaster Dark",
             "light": false,
             "colors": {
                 "bg": "#0e1415",
@@ -392,140 +371,132 @@ Singleton {
         {
             "id": "catppuccin-latte",
             "name": "Catppuccin Latte",
-            "kitty": "Catppuccin-Latte",
             "light": true,
             "colors": {
                 "bg": "#e6e9ef",
                 "surface": "#eff1f5",
                 "elevated": "#ccd0da",
-                "fg": "#4c4f69",
-                "fgMuted": "#8c8fa1",
+                "fg": "#484b64",
+                "fgMuted": "#65687c",
                 "fgSubtle": "#acb0be",
-                "primary": "#1e66f5",
-                "red": "#d20f39",
-                "yellow": "#df8e1d",
-                "green": "#40a02b",
-                "blue": "#179299"
+                "primary": "#0e5bf4",
+                "red": "#d10f39",
+                "yellow": "#935e13",
+                "green": "#307820",
+                "blue": "#12757a"
             }
         },
         {
             "id": "solarized-light",
             "name": "Solarized Light",
-            "kitty": "Solarized Light",
             "light": true,
             "colors": {
                 "bg": "#eee8d5",
                 "surface": "#fdf6e3",
                 "elevated": "#e4ddc8",
-                "fg": "#657b83",
-                "fgMuted": "#93a1a1",
+                "fg": "#404e54",
+                "fgMuted": "#5e6b6b",
                 "fgSubtle": "#c3c7bc",
-                "primary": "#268bd2",
-                "red": "#dc322f",
-                "yellow": "#b58900",
-                "green": "#859900",
-                "blue": "#2aa198"
+                "primary": "#1e6da5",
+                "red": "#ca2522",
+                "yellow": "#846400",
+                "green": "#617000",
+                "blue": "#1e756e"
             }
         },
         {
             "id": "gruvbox-light",
             "name": "Gruvbox Light",
-            "kitty": "Gruvbox Light",
             "light": true,
             "colors": {
                 "bg": "#f2e5bc",
                 "surface": "#fbf1c7",
                 "elevated": "#ebdbb2",
                 "fg": "#3c3836",
-                "fgMuted": "#928374",
+                "fgMuted": "#716559",
                 "fgSubtle": "#bdae93",
                 "primary": "#076678",
                 "red": "#9d0006",
-                "yellow": "#b57614",
-                "green": "#79740e",
-                "blue": "#427b58"
+                "yellow": "#8e5d10",
+                "green": "#6e6a0d",
+                "blue": "#3d7251"
             }
         },
         {
             "id": "tokyonight-day",
             "name": "Tokyo Night Day",
-            "kitty": "Tokyo Night Day",
             "light": true,
             "colors": {
                 "bg": "#d0d5e3",
                 "surface": "#e1e2e7",
                 "elevated": "#c4c8da",
-                "fg": "#3760bf",
-                "fgMuted": "#8990b3",
+                "fg": "#233e7b",
+                "fgMuted": "#535b81",
                 "fgSubtle": "#a8aecb",
-                "primary": "#2e7de9",
-                "red": "#f52a65",
-                "yellow": "#8c6c3e",
-                "green": "#587539",
-                "blue": "#007197"
+                "primary": "#145ab9",
+                "red": "#ba093c",
+                "yellow": "#735833",
+                "green": "#4b6431",
+                "blue": "#006486"
             }
         },
         {
             "id": "dayfox",
             "name": "Dayfox",
-            "kitty": "Dayfox",
             "light": true,
             "colors": {
                 "bg": "#e4dcd4",
                 "surface": "#f6f2ee",
                 "elevated": "#dbd1dd",
                 "fg": "#3d2b5a",
-                "fgMuted": "#837a72",
+                "fgMuted": "#68615a",
                 "fgSubtle": "#aab0ad",
                 "primary": "#2848a9",
                 "red": "#a5222f",
-                "yellow": "#ac5402",
+                "yellow": "#9c4c02",
                 "green": "#396847",
-                "blue": "#287980"
+                "blue": "#246c72"
             }
         },
         {
             "id": "rose-pine-dawn",
             "name": "Rosé Pine Dawn",
-            "kitty": "Rosé Pine Dawn",
             "light": true,
             "colors": {
                 "bg": "#f2e9e1",
                 "surface": "#faf4ed",
                 "elevated": "#dfdad9",
-                "fg": "#575279",
-                "fgMuted": "#797593",
+                "fg": "#4e496c",
+                "fgMuted": "#6b6784",
                 "fgSubtle": "#9893a5",
-                "primary": "#907aa9",
-                "red": "#b4637a",
-                "yellow": "#ea9d34",
+                "primary": "#786094",
+                "red": "#a44f67",
+                "yellow": "#965d10",
                 "green": "#286983",
-                "blue": "#56949f"
+                "blue": "#42717a"
             }
         },
         {
             "id": "everforest-light",
             "name": "Everforest Light",
-            "kitty": "Everforest Light Medium",
             "light": true,
             "colors": {
                 "bg": "#efebd4",
                 "surface": "#fdf6e3",
                 "elevated": "#e6e2cc",
-                "fg": "#5c6a72",
-                "fgMuted": "#829181",
+                "fg": "#454f55",
+                "fgMuted": "#616e60",
                 "fgSubtle": "#a6b0a0",
-                "primary": "#35a77c",
-                "red": "#f85552",
-                "yellow": "#dfa000",
-                "green": "#8da101",
-                "blue": "#3a94c5"
+                "primary": "#267859",
+                "red": "#d50c09",
+                "yellow": "#8b6300",
+                "green": "#637101",
+                "blue": "#2c7196"
             }
         },
         {
             "id": "one-light",
             "name": "One Light",
-            "kitty": "One Half Light",
             "light": true,
             "colors": {
                 "bg": "#f0f0f1",
@@ -534,17 +505,16 @@ Singleton {
                 "fg": "#383a42",
                 "fgMuted": "#696c77",
                 "fgSubtle": "#a0a1a7",
-                "primary": "#4078f2",
-                "red": "#e45649",
-                "yellow": "#c18401",
-                "green": "#50a14f",
-                "blue": "#0184bc"
+                "primary": "#2263f0",
+                "red": "#d02e1f",
+                "yellow": "#936501",
+                "green": "#3d7b3c",
+                "blue": "#0175a7"
             }
         },
         {
             "id": "github-light",
             "name": "GitHub Light",
-            "kitty": "GitHub Light",
             "light": true,
             "colors": {
                 "bg": "#f6f8fa",
@@ -563,45 +533,42 @@ Singleton {
         {
             "id": "kanagawa-lotus",
             "name": "Kanagawa Lotus",
-            "kitty": "kanagawa_light",
             "light": true,
             "colors": {
                 "bg": "#e5ddb0",
                 "surface": "#f2ecbc",
                 "elevated": "#dcd5ac",
-                "fg": "#545464",
-                "fgMuted": "#716e61",
+                "fg": "#444451",
+                "fgMuted": "#646156",
                 "fgSubtle": "#8a8980",
                 "primary": "#624c83",
-                "red": "#c84053",
-                "yellow": "#cc6d00",
-                "green": "#6f894e",
-                "blue": "#4d699b"
+                "red": "#b03344",
+                "yellow": "#954f00",
+                "green": "#54683b",
+                "blue": "#476190"
             }
         },
         {
             "id": "ayu-light",
             "name": "Ayu Light",
-            "kitty": "Ayu Light",
             "light": true,
             "colors": {
                 "bg": "#f3f4f5",
                 "surface": "#fafafa",
                 "elevated": "#e7e8e9",
-                "fg": "#5b6673",
-                "fgMuted": "#828c99",
+                "fg": "#4b545f",
+                "fgMuted": "#67717e",
                 "fgSubtle": "#abb2b9",
-                "primary": "#41a6d9",
-                "red": "#f07171",
-                "yellow": "#f19618",
-                "green": "#86b200",
-                "blue": "#4cbe99"
+                "primary": "#2177a3",
+                "red": "#de1717",
+                "yellow": "#a1610a",
+                "green": "#5c7a00",
+                "blue": "#2d7d63"
             }
         },
         {
             "id": "flexoki-light",
             "name": "Flexoki Light",
-            "kitty": "Flexoki (Light)",
             "light": true,
             "colors": {
                 "bg": "#f2f0e5",
@@ -612,72 +579,68 @@ Singleton {
                 "fgSubtle": "#b7b5ac",
                 "primary": "#205ea6",
                 "red": "#af3029",
-                "yellow": "#ad8301",
-                "green": "#66800b",
-                "blue": "#24837b"
+                "yellow": "#8a6901",
+                "green": "#5e760a",
+                "blue": "#217a72"
             }
         },
         {
             "id": "selenized-light",
             "name": "Selenized Light",
-            "kitty": "Selenized Light",
             "light": true,
             "colors": {
                 "bg": "#ece3cc",
                 "surface": "#fbf3db",
                 "elevated": "#d5cdb6",
-                "fg": "#53676d",
-                "fgMuted": "#909995",
+                "fg": "#3d4c50",
+                "fgMuted": "#5f6864",
                 "fgSubtle": "#b8beb6",
-                "primary": "#0072d4",
-                "red": "#d2212d",
-                "yellow": "#ad8900",
-                "green": "#489100",
-                "blue": "#009c8f"
+                "primary": "#0066be",
+                "red": "#c71f2b",
+                "yellow": "#7d6300",
+                "green": "#397300",
+                "blue": "#007369"
             }
         },
         {
             "id": "tomorrow",
             "name": "Tomorrow",
-            "kitty": "Tomorrow",
             "light": true,
             "colors": {
                 "bg": "#f2f2f2",
                 "surface": "#ffffff",
                 "elevated": "#e0e0e0",
                 "fg": "#4d4d4c",
-                "fgMuted": "#8e908c",
+                "fgMuted": "#6e706c",
                 "fgSubtle": "#b4b7b4",
-                "primary": "#4271ae",
+                "primary": "#4270ad",
                 "red": "#c82829",
-                "yellow": "#eab700",
-                "green": "#718c00",
-                "blue": "#3e999f"
+                "yellow": "#896b00",
+                "green": "#617800",
+                "blue": "#31797e"
             }
         },
         {
             "id": "zenbones-light",
             "name": "Zenbones Light",
-            "kitty": "zenbones_light",
             "light": true,
             "colors": {
                 "bg": "#e4dfdc",
                 "surface": "#f0edec",
                 "elevated": "#d6cdc9",
                 "fg": "#2c363c",
-                "fgMuted": "#6e787e",
+                "fgMuted": "#5d656a",
                 "fgSubtle": "#a8a19d",
                 "primary": "#286486",
                 "red": "#a8334c",
                 "yellow": "#944927",
                 "green": "#4f6c31",
-                "blue": "#3b8992"
+                "blue": "#2f6c74"
             }
         },
         {
             "id": "modus-operandi",
             "name": "Modus Operandi",
-            "kitty": "Modus Operandi",
             "light": true,
             "colors": {
                 "bg": "#f2f2f2",
@@ -696,64 +659,60 @@ Singleton {
         {
             "id": "alabaster",
             "name": "Alabaster",
-            "kitty": "Alabaster",
             "light": true,
             "colors": {
                 "bg": "#eeeeee",
                 "surface": "#f7f7f7",
                 "elevated": "#dedede",
                 "fg": "#000000",
-                "fgMuted": "#777777",
+                "fgMuted": "#6c6c6c",
                 "fgSubtle": "#aaaaaa",
                 "primary": "#325cc0",
                 "red": "#aa3731",
-                "yellow": "#cb9000",
-                "green": "#448c37",
-                "blue": "#0083b2"
+                "yellow": "#8e6500",
+                "green": "#3b7a30",
+                "blue": "#00759e"
             }
         },
         {
             "id": "adwaita-light",
             "name": "Adwaita Light",
-            "kitty": "Adwaita light",
             "light": true,
             "colors": {
                 "bg": "#f2f1f0",
                 "surface": "#fcfcfc",
                 "elevated": "#deddda",
                 "fg": "#3d3846",
-                "fgMuted": "#77767b",
+                "fgMuted": "#6f6e72",
                 "fgSubtle": "#b0afac",
-                "primary": "#1c71d8",
-                "red": "#e01b24",
-                "yellow": "#e66100",
-                "green": "#2ec27e",
-                "blue": "#1a9a86"
+                "primary": "#1b6dd0",
+                "red": "#d91a23",
+                "yellow": "#b94e00",
+                "green": "#1e7e52",
+                "blue": "#157c6c"
             }
         },
         {
             "id": "dawnfox",
             "name": "Dawnfox",
-            "kitty": "Dawnfox",
             "light": true,
             "colors": {
                 "bg": "#ebe5df",
                 "surface": "#faf4ed",
                 "elevated": "#d0d8d8",
-                "fg": "#575279",
-                "fgMuted": "#797593",
+                "fg": "#4b4769",
+                "fgMuted": "#686480",
                 "fgSubtle": "#9893a5",
                 "primary": "#286983",
-                "red": "#b4637a",
-                "yellow": "#ea9d34",
-                "green": "#618774",
-                "blue": "#56949f"
+                "red": "#a04d64",
+                "yellow": "#935b0f",
+                "green": "#4f6e5f",
+                "blue": "#406e77"
             }
         },
         {
             "id": "bluloco-light",
             "name": "Bluloco Light",
-            "kitty": "Bluloco Light",
             "light": true,
             "colors": {
                 "bg": "#f0f0f0",
@@ -763,10 +722,10 @@ Singleton {
                 "fgMuted": "#676a77",
                 "fgSubtle": "#a0a1a7",
                 "primary": "#275fe4",
-                "red": "#d52753",
-                "yellow": "#df631c",
-                "green": "#23974a",
-                "blue": "#0099e1"
+                "red": "#d02651",
+                "yellow": "#b45017",
+                "green": "#1d7e3e",
+                "blue": "#0074ab"
             }
         }
     ]
