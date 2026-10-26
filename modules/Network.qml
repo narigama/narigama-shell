@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell.Networking
 import qs.components
 import qs.config
+import qs.services
 
 BarButton {
     id: root
@@ -12,21 +13,11 @@ BarButton {
     readonly property var wifiNetwork: wifi?.networks.values.find(n => n.connected) ?? null
 
     icon: {
-        if (wired)
-            return Icons.ethernet;
+        const net = wired ? Icons.ethernet : !wifi ? Icons.lanDisconnect : !Networking.wifiEnabled ? Icons.wifiOff : wifi.state === ConnectionState.Connecting ? Icons.wifiAlert : wifiNetwork ? Icons.forWifiSignal(wifiNetwork.signalStrength) : Icons.wifiOffline;
 
-        if (!wifi)
-            return Icons.lanDisconnect;
-
-        if (!Networking.wifiEnabled)
-            return Icons.wifiOff;
-
-        if (wifi.state === ConnectionState.Connecting)
-            return Icons.wifiAlert;
-
-        return wifiNetwork ? Icons.forWifiSignal(wifiNetwork.signalStrength) : Icons.wifiOffline;
+        return Vpn.connected || Vpn.connecting ? net + " " + Icons.shieldLock : net;
     }
     labelShow: false
-    color: Theme.primary
+    color: Vpn.connecting ? Theme.yellow : Vpn.connected ? Theme.green : Theme.primary
     leftDropdown: "network"
 }

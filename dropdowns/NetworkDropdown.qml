@@ -51,6 +51,7 @@ ColumnLayout {
     // Keep the wifi list fresh only while the dropdown is open.
     Component.onCompleted: {
         networks = sortedNetworks;
+        Vpn.refresh();
 
         if (wifi)
             Qt.callLater(() => wifi.scannerEnabled = true);
@@ -100,6 +101,72 @@ ColumnLayout {
     }
 
     SectionHeader {
+        visible: Vpn.available
+        text: "VPN"
+
+        IconButton {
+            visible: Vpn.hasProtonApp
+            icon: Icons.application
+            text: "App"
+            iconSize: Theme.fontSize
+            implicitHeight: 24
+            foreground: Theme.fgMuted
+            onClicked: Vpn.openProtonApp()
+        }
+    }
+
+    ListRow {
+        visible: Vpn.hasProton
+        icon: Vpn.protonConnected ? Icons.shieldLock : Icons.shieldOutline
+        iconColor: Vpn.protonBusy ? Theme.yellow : Vpn.protonConnected ? Theme.green : Theme.fgMuted
+        title: "Proton VPN"
+        subtitle: Vpn.protonBusy ? (Vpn.protonAction === "disconnecting" || Vpn.protonConnected ? "Disconnecting…" : "Connecting…") : Vpn.protonConnected ? "Connected" + (Vpn.protonServer ? " · " + Vpn.protonServer : "") : "Fastest server"
+        highlighted: Vpn.protonConnected
+        clickable: !Vpn.protonBusy
+        onClicked: Vpn.toggleProton()
+    }
+
+    RowLayout {
+        visible: Vpn.hasProton
+        Layout.fillWidth: true
+        spacing: 4
+
+        Repeater {
+            model: Vpn.protonCountries
+
+            delegate: IconButton {
+                required property string modelData
+
+                Layout.fillWidth: true
+                text: modelData
+                implicitHeight: 28
+                enabled: !Vpn.protonBusy
+                active: Vpn.protonConnected && Vpn.protonCountry === modelData
+                background: Theme.surface
+                onClicked: Vpn.connectProtonCountry(modelData)
+            }
+        }
+    }
+
+    Repeater {
+        model: Vpn.profiles
+
+        delegate: ListRow {
+            required property var modelData
+            readonly property bool busy: Vpn.busyProfile === modelData.id || modelData.connecting
+
+            icon: modelData.connected ? Icons.shieldLock : Icons.shieldOutline
+            iconColor: busy ? Theme.yellow : modelData.connected ? Theme.green : Theme.fgMuted
+            title: modelData.name
+            subtitle: [modelData.kind === "wireguard" ? "WireGuard" : "VPN", busy ? (modelData.connected || modelData.state === "deactivating" ? "Disconnecting…" : "Connecting…") : modelData.connected ? "Connected" : ""].filter(t => t !== "").join(" · ")
+            highlighted: modelData.connected
+            clickable: !busy
+            onClicked: Vpn.toggleProfile(modelData)
+        }
+    }
+
+    SectionHeader {
+        Layout.topMargin: Vpn.available ? 8 : 0
         visible: root.wiredDevices.length > 0
         text: "Wired"
     }
@@ -121,7 +188,7 @@ ColumnLayout {
     }
 
     SectionHeader {
-        Layout.topMargin: root.wiredDevices.length > 0 ? 8 : 0
+        Layout.topMargin: root.wiredDevices.length > 0 || Vpn.available ? 8 : 0
         visible: root.wifi !== null
         text: "Wi-Fi"
 

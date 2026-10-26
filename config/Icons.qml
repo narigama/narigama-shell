@@ -76,6 +76,8 @@ Singleton {
     readonly property string wifiAlert: glyph(0xf092b)
     readonly property string ethernet: glyph(0xf0200)
     readonly property string lanDisconnect: glyph(0xf0319)
+    readonly property string shieldLock: glyph(0xf099c)
+    readonly property string shieldOutline: glyph(0xf0499)
 
     readonly property string bluetooth: glyph(0xf00af)
     readonly property string bluetoothConnect: glyph(0xf00b1)

@@ -44,7 +44,7 @@ Singleton {
             "powerProfiles": ["powerprofilesctl"]
         })
 
-    readonly property var checked: ["systemctl", "grim", "slurp", "wl-copy", "wl-paste", "satty", "wf-recorder", "cliphist", "hyprpicker", "ddcutil", "gamemoded", "brightnessctl", "powerprofilesctl", "notify-send", "pacman", "fakeroot", "paru", "yay", "apt", "dnf", "awww", "swaybg", "matugen", "vipsthumbnail", "magick"]
+    readonly property var checked: ["systemctl", "grim", "slurp", "wl-copy", "wl-paste", "satty", "wf-recorder", "cliphist", "hyprpicker", "ddcutil", "gamemoded", "brightnessctl", "powerprofilesctl", "notify-send", "pacman", "fakeroot", "paru", "yay", "apt", "dnf", "awww", "swaybg", "matugen", "vipsthumbnail", "magick", "nmcli", "protonvpn", "protonvpn-app", "wg-quick"]
 
     // Package manager used for update checks: "pacman", "apt", "dnf" or "".
     readonly property string packageManager: has("pacman") ? "pacman" : has("apt") ? "apt" : has("dnf") ? "dnf" : ""

@@ -42,6 +42,8 @@ Singleton {
         return network?.name ?? "";
     }
     property string lastNetwork: ""
+    readonly property string vpnName: Vpn.activeName
+    property string lastVpn: ""
 
     property string lastLayout: ""
 
@@ -77,6 +79,7 @@ Singleton {
         onTriggered: {
             root.lastBluetooth = root.connectedBluetooth;
             root.lastNetwork = root.networkName;
+            root.lastVpn = root.vpnName;
             root.armed = true;
         }
     }
@@ -163,6 +166,18 @@ Singleton {
             show(Icons.lanDisconnect, "Disconnected", -1, Theme.fgMuted);
 
         lastNetwork = networkName;
+    }
+
+    onVpnNameChanged: {
+        if (!armed || vpnName === lastVpn)
+            return;
+
+        if (vpnName !== "")
+            show(Icons.shieldLock, vpnName + " connected", -1, Theme.green);
+        else
+            show(Icons.shieldOutline, (lastVpn || "VPN") + " disconnected", -1, Theme.fgMuted);
+
+        lastVpn = vpnName;
     }
 
     // Compositors report the layout once per keyboard, so repeats are dropped.
