@@ -1,89 +1,24 @@
-pragma Singleton
-
 import QtQuick
 import Quickshell
+pragma Singleton
 
 // Active palette and sizing; the palette comes from config/Themes.qml via the saved theme id.
 Singleton {
     readonly property var current: Themes.find(ShellState.theme)
     readonly property bool fromWallpaper: ShellState.matchWallpaper && ShellState.wallpaperColors !== null
     readonly property bool light: fromWallpaper ? ShellState.wallpaperThemeMode === "light" : current.light
-    // callLater coalesces a theme change that also moves lastDark/LightTheme into one run.
-    onLightChanged: Qt.callLater(applyToApps)
-    onColorsChanged: Qt.callLater(applyToApps)
-    Component.onCompleted: Qt.callLater(applyToApps)
-
-    Connections {
-        target: ShellState
-
-        function onLastDarkThemeChanged() {
-            Qt.callLater(Theme.applyToApps);
-        }
-
-        function onLastLightThemeChanged() {
-            Qt.callLater(Theme.applyToApps);
-        }
-    }
-
-    function kittyConf(c, isLight) {
-        return [
-            "foreground " + c.fg,
-            "background " + c.bg,
-            "selection_foreground " + c.fg,
-            "selection_background " + c.elevated,
-            "cursor " + c.fg,
-            "cursor_text_color " + c.bg,
-            "url_color " + c.primary,
-            "active_tab_foreground " + c.fg,
-            "active_tab_background " + c.elevated,
-            "inactive_tab_foreground " + c.fgMuted,
-            "inactive_tab_background " + c.surface,
-            "color0 " + (isLight ? c.fg : c.bg),
-            "color8 " + c.fgMuted,
-            "color1 " + c.red,
-            "color9 " + c.red,
-            "color2 " + c.green,
-            "color10 " + c.green,
-            "color3 " + c.yellow,
-            "color11 " + c.yellow,
-            "color4 " + c.primary,
-            "color12 " + c.primary,
-            "color5 " + c.primary,
-            "color13 " + c.primary,
-            "color6 " + c.blue,
-            "color14 " + c.blue,
-            "color7 " + c.fg,
-            "color15 " + c.fg
-        ].join("\n") + "\n";
-    }
-
     // kitty picks dark-/light-theme.auto.conf from the portal color-scheme, so both are kept
     // written before the scheme flips; USR1 makes running kittys reload a same-mode theme change.
-    // text_fg_override_threshold lives in kitty.conf (auto.conf only parses colour keys) and keeps
-    // 24-bit RGB text from dark-themed TUIs readable on light backgrounds.
     // gtk-theme before color-scheme: Electron apps (Slack) re-derive the scheme from a gtk-theme change and land on light.
     readonly property string appsScript: 'if command -v kitty >/dev/null; then
     dir="${XDG_CONFIG_HOME:-$HOME/.config}/kitty"
     mkdir -p "$dir"
-    grep -q "^text_fg_override_threshold" "$dir/kitty.conf" 2>/dev/null || printf "\ntext_fg_override_threshold 4.5 ratio\n" >> "$dir/kitty.conf"
     printf "%s" "$3" > "$dir/dark-theme.auto.conf.tmp" && mv "$dir/dark-theme.auto.conf.tmp" "$dir/dark-theme.auto.conf"
     printf "%s" "$4" > "$dir/light-theme.auto.conf.tmp" && mv "$dir/light-theme.auto.conf.tmp" "$dir/light-theme.auto.conf"
     pkill -USR1 -x kitty
 fi
 gsettings set org.gnome.desktop.interface gtk-theme "$1" && gsettings set org.gnome.desktop.interface color-scheme "$2"'
-
-    function applyToApps() {
-        if (!ShellState.themeModeToApps)
-            return;
-
-        const darkColors = fromWallpaper && !light ? ShellState.wallpaperColors : Themes.find(ShellState.lastDarkTheme).colors;
-        const lightColors = fromWallpaper && light ? ShellState.wallpaperColors : Themes.find(ShellState.lastLightTheme).colors;
-
-        Quickshell.execDetached(["sh", "-c", appsScript, "sh", light ? "Adwaita" : "Adwaita-dark", light ? "prefer-light" : "prefer-dark", kittyConf(darkColors, false), kittyConf(lightColors, true)]);
-    }
-
     readonly property var colors: fromWallpaper ? ShellState.wallpaperColors : current.colors
-
     readonly property color bg: colors.bg
     readonly property color surface: colors.surface
     readonly property color elevated: colors.elevated
@@ -95,7 +30,6 @@ gsettings set org.gnome.desktop.interface gtk-theme "$1" && gsettings set org.gn
     readonly property color yellow: colors.yellow
     readonly property color green: colors.green
     readonly property color blue: colors.blue
-
     // The saved fonts, unless fontconfig says they aren't installed: then the first Nerd Font, so
     // icons never render as boxes (and plain monospace if there's no Nerd Font at all).
     readonly property string fontFamily: Fonts.textFonts.length === 0 || Fonts.textFonts.includes(ShellState.fontFamily) ? ShellState.fontFamily : (Fonts.iconFonts[0] ?? "monospace")
@@ -103,11 +37,41 @@ gsettings set org.gnome.desktop.interface gtk-theme "$1" && gsettings set org.gn
     readonly property string iconFontFamily: Fonts.iconFonts.length === 0 || Fonts.iconFonts.includes(ShellState.iconFontFamily) ? ShellState.iconFontFamily : Fonts.iconFonts[0]
     readonly property int fontSize: ShellState.fontSize
     readonly property int iconSize: ShellState.iconSize
-
     // 37px at the default sizes; grows if the text or icons need more room.
     readonly property int barHeight: Math.max(37, iconSize + 13, fontSize + 22)
     readonly property int buttonPadding: 8
     readonly property int iconGap: 8
     readonly property int workspacePadding: 9
     readonly property int workspaceMinWidth: 25
+
+    function kittyConf(c, isLight) {
+        return ["foreground " + c.fg, "background " + c.bg, "selection_foreground " + c.fg, "selection_background " + c.elevated, "cursor " + c.fg, "cursor_text_color " + c.bg, "url_color " + c.primary, "active_tab_foreground " + c.fg, "active_tab_background " + c.elevated, "inactive_tab_foreground " + c.fgMuted, "inactive_tab_background " + c.surface, "color0 " + (isLight ? c.fg : c.bg), "color8 " + c.fgMuted, "color1 " + c.red, "color9 " + c.red, "color2 " + c.green, "color10 " + c.green, "color3 " + c.yellow, "color11 " + c.yellow, "color4 " + c.primary, "color12 " + c.primary, "color5 " + c.primary, "color13 " + c.primary, "color6 " + c.blue, "color14 " + c.blue, "color7 " + c.fg, "color15 " + c.fg].join("\n") + "\n";
+    }
+
+    function applyToApps() {
+        if (!ShellState.themeModeToApps)
+            return ;
+
+        const darkColors = fromWallpaper && !light ? ShellState.wallpaperColors : Themes.find(ShellState.lastDarkTheme).colors;
+        const lightColors = fromWallpaper && light ? ShellState.wallpaperColors : Themes.find(ShellState.lastLightTheme).colors;
+        Quickshell.execDetached(["sh", "-c", appsScript, "sh", light ? "Adwaita" : "Adwaita-dark", light ? "prefer-light" : "prefer-dark", kittyConf(darkColors, false), kittyConf(lightColors, true)]);
+    }
+
+    // callLater coalesces a theme change that also moves lastDark/LightTheme into one run.
+    onLightChanged: Qt.callLater(applyToApps)
+    onColorsChanged: Qt.callLater(applyToApps)
+    Component.onCompleted: Qt.callLater(applyToApps)
+
+    Connections {
+        function onLastDarkThemeChanged() {
+            Qt.callLater(Theme.applyToApps);
+        }
+
+        function onLastLightThemeChanged() {
+            Qt.callLater(Theme.applyToApps);
+        }
+
+        target: ShellState
+    }
+
 }
