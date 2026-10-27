@@ -19,6 +19,16 @@ Singleton {
         return player?.identity || player?.desktopEntry || "Player";
     }
 
+    function focusPlayer(player) {
+        if (!player)
+            return;
+
+        const bus = (player.dbusName || "").replace(/^org\.mpris\.MediaPlayer2\./, "").split(".")[0];
+
+        if (!Compositor.focusApp([player.desktopEntry, player.identity, bus, player.trackTitle]) && player.canRaise)
+            player.raise();
+    }
+
     // MPRIS doesn't signal position changes during playback, so poll while something plays.
     Timer {
         interval: 1000

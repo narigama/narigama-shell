@@ -19,6 +19,8 @@ ColumnLayout {
     width: 380
     spacing: 12
 
+    Component.onCompleted: Compositor.refreshWindows()
+
     StyledText {
         visible: root.player === null
         text: "Nothing playing"
@@ -36,26 +38,43 @@ ColumnLayout {
             readonly property string rawUrl: root.player?.trackArtUrl ?? ""
             property string shownUrl: ""
             property string prevUrl: ""
+            property bool ready: false
 
             Layout.preferredWidth: 96
             Layout.preferredHeight: 96
             color: Theme.elevated
 
             onRawUrlChanged: {
+                if (!ready)
+                    return;
+
                 if (rawUrl === "") {
                     clearArtTimer.restart();
                     return;
                 }
 
                 clearArtTimer.stop();
+                artFadeOut.stop();
 
                 if (rawUrl !== shownUrl) {
-                    prevUrl = shownUrl;
+                    if (shownUrl !== "" && art.status === Image.Ready) {
+                        prevUrl = shownUrl;
+                        prevArt.opacity = 1;
+                    }
+
+                    artFadeIn.stop();
+                    art.opacity = 0;
                     shownUrl = rawUrl;
+
+                    if (art.status === Image.Ready)
+                        artFadeIn.restart();
                 }
             }
 
-            Component.onCompleted: shownUrl = rawUrl
+            Component.onCompleted: {
+                shownUrl = rawUrl;
+                ready = true;
+            }
 
             // Players briefly clear trackArtUrl between tracks; wait before dropping the cover.
             Timer {
@@ -63,18 +82,25 @@ ColumnLayout {
 
                 interval: 200
                 onTriggered: {
-                    artBox.prevUrl = "";
-                    artBox.shownUrl = "";
+                    prevArt.opacity = 0;
+                    artFadeOut.restart();
                 }
             }
 
             StyledText {
                 anchors.centerIn: parent
-                visible: art.status !== Image.Ready && prevArt.status !== Image.Ready
+                opacity: art.status !== Image.Ready && prevArt.status !== Image.Ready ? 1 : 0
                 text: Icons.forPlayer(root.player)
                 font.family: Theme.iconFontFamily
                 color: Theme.blue
                 font.pixelSize: 40
+
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: 200
+                        easing.type: Easing.OutCubic
+                    }
+                }
             }
 
             Image {
@@ -83,7 +109,6 @@ ColumnLayout {
                 anchors.fill: parent
                 source: artBox.prevUrl
                 fillMode: Image.PreserveAspectCrop
-                asynchronous: true
                 sourceSize: Qt.size(192, 192)
             }
 
@@ -95,13 +120,45 @@ ColumnLayout {
                 fillMode: Image.PreserveAspectCrop
                 asynchronous: true
                 sourceSize: Qt.size(192, 192)
-                opacity: status === Image.Ready ? 1 : 0
 
-                Behavior on opacity {
-                    NumberAnimation {
-                        duration: 200
-                        easing.type: Easing.OutCubic
-                    }
+                onStatusChanged: {
+                    if (status === Image.Ready && artBox.ready && opacity < 1)
+                        artFadeIn.restart();
+                }
+            }
+
+            NumberAnimation {
+                id: artFadeIn
+
+                target: art
+                property: "opacity"
+                from: 0
+                to: 1
+                duration: 200
+                easing.type: Easing.OutCubic
+                onFinished: prevArt.opacity = 0
+            }
+
+            NumberAnimation {
+                id: artFadeOut
+
+                target: art
+                property: "opacity"
+                to: 0
+                duration: 200
+                easing.type: Easing.OutCubic
+                onFinished: {
+                    artBox.prevUrl = "";
+                    artBox.shownUrl = "";
+                }
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                cursorShape: Qt.PointingHandCursor
+                onClicked: {
+                    Media.focusPlayer(root.player);
+                    Dropdowns.close();
                 }
             }
         }
@@ -137,11 +194,11 @@ ColumnLayout {
                 color: Theme.fgMuted
             }
 
-            StyledText {
+            RollingText {
                 Layout.fillWidth: true
                 text: Media.playerName(root.player)
                 color: Theme.fgSubtle
-                font.pixelSize: Theme.fontSize - 2
+                pixelSize: Theme.fontSize - 2
             }
         }
     }
@@ -245,10 +302,10 @@ ColumnLayout {
             highlighted: modelData === root.player
             onClicked: Media.chosen = modelData
 
-            StyledText {
-                text: modelData.isPlaying ? Icons.play : Icons.pause
-                font.family: Theme.iconFontFamily
-                color: Theme.fgMuted
+            IconButton {
+                icon: modelData.isPlaying ? Icons.play : Icons.pause
+                foreground: Theme.fgMuted
+                onClicked: modelData.togglePlaying()
             }
         }
     }

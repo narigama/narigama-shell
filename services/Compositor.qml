@@ -4,6 +4,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.I3
+import Quickshell.Wayland
 import Quickshell.WindowManager
 
 // One interface over the compositor's workspaces and focus, so the rest of the shell doesn't
@@ -148,6 +149,52 @@ Singleton {
     function refreshWindows() {
         if (isHyprland)
             Hyprland.refreshToplevels();
+    }
+
+    // Activates the workspace (or toplevel) matching any of `names` (desktopEntry, identity, title).
+    function focusApp(names) {
+        const needles = [];
+
+        for (const n of names ?? []) {
+            if (!n)
+                continue;
+
+            const lower = String(n).toLowerCase();
+            const tail = lower.split(".").pop();
+
+            needles.push(lower);
+            if (tail && tail !== lower)
+                needles.push(tail);
+        }
+
+        if (needles.length === 0)
+            return false;
+
+        const matches = (...fields) => fields.some(f => {
+            const hay = (f || "").toLowerCase();
+
+            return hay !== "" && needles.some(n => hay === n || hay.includes(n));
+        });
+
+        if (isHyprland) {
+            for (const w of Hyprland.workspaces.values) {
+                for (const t of w.toplevels.values) {
+                    if (matches(t.wayland?.appId, t.lastIpcObject?.class, t.lastIpcObject?.initialClass, t.lastIpcObject?.initialTitle, t.title)) {
+                        w.activate();
+                        return true;
+                    }
+                }
+            }
+        }
+
+        for (const t of ToplevelManager.toplevels.values) {
+            if (matches(t.appId, t.title)) {
+                t.activate();
+                return true;
+            }
+        }
+
+        return false;
     }
 
     // The WindowManager module only binds the protocol once something reads it.

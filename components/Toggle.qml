@@ -8,7 +8,7 @@ Item {
     property bool checked
     property color accent: Theme.primary
 
-    signal toggled
+    signal toggled()
 
     implicitWidth: 36
     implicitHeight: 20
@@ -26,10 +26,30 @@ Item {
 
             Behavior on x {
                 NumberAnimation {
-                    duration: 120
+                    duration: 150
+                    easing.type: Easing.OutCubic
                 }
+
             }
+
+            Behavior on color {
+                ColorAnimation {
+                    duration: 150
+                    easing.type: Easing.OutCubic
+                }
+
+            }
+
         }
+
+        Behavior on color {
+            ColorAnimation {
+                duration: 150
+                easing.type: Easing.OutCubic
+            }
+
+        }
+
     }
 
     MouseArea {
@@ -37,4 +57,5 @@ Item {
         cursorShape: Qt.PointingHandCursor
         onClicked: root.toggled()
     }
+
 }

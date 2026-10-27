@@ -12,13 +12,50 @@ Rectangle {
     property bool active: false
     property bool enabled: true
     property color background: "transparent"
+    property string shownIcon: ""
+    property string outgoingIcon: ""
 
-    signal clicked
+    signal clicked()
 
     implicitWidth: Math.max(implicitHeight, content.implicitWidth + 16)
     implicitHeight: 32
     color: active ? Theme.primary : mouse.containsMouse && enabled ? Theme.elevated : background
     opacity: enabled ? 1 : 0.4
+    onIconChanged: {
+        if (shownIcon === "" || icon === "") {
+            shownIcon = icon;
+            return ;
+        }
+        if (icon !== shownIcon) {
+            outgoingIcon = shownIcon;
+            shownIcon = icon;
+            iconFade.restart();
+        }
+    }
+    Component.onCompleted: shownIcon = icon
+
+    ParallelAnimation {
+        id: iconFade
+
+        NumberAnimation {
+            target: outgoingGlyph
+            property: "opacity"
+            from: 1
+            to: 0
+            duration: 180
+            easing.type: Easing.OutCubic
+        }
+
+        NumberAnimation {
+            target: incomingGlyph
+            property: "opacity"
+            from: 0
+            to: 1
+            duration: 180
+            easing.type: Easing.OutCubic
+        }
+
+    }
 
     Row {
         id: content
@@ -26,13 +63,42 @@ Rectangle {
         anchors.centerIn: parent
         spacing: 8
 
-        StyledText {
+        Item {
             anchors.verticalCenter: parent.verticalCenter
-            visible: root.icon !== ""
-            text: root.icon
-            font.family: Theme.iconFontFamily
-            color: root.active ? Theme.surface : root.foreground
-            font.pixelSize: root.iconSize
+            visible: root.shownIcon !== ""
+            implicitWidth: Math.max(incomingGlyph.implicitWidth, iconFade.running ? outgoingGlyph.implicitWidth : 0)
+            implicitHeight: incomingGlyph.implicitHeight
+
+            StyledText {
+                id: outgoingGlyph
+
+                anchors.centerIn: parent
+                text: root.outgoingIcon
+                font.family: Theme.iconFontFamily
+                color: incomingGlyph.color
+                font.pixelSize: root.iconSize
+                opacity: 0
+            }
+
+            StyledText {
+                id: incomingGlyph
+
+                anchors.centerIn: parent
+                text: root.shownIcon
+                font.family: Theme.iconFontFamily
+                color: root.active ? Theme.surface : root.foreground
+                font.pixelSize: root.iconSize
+
+                Behavior on color {
+                    ColorAnimation {
+                        duration: 180
+                        easing.type: Easing.OutCubic
+                    }
+
+                }
+
+            }
+
         }
 
         RollingText {
@@ -42,6 +108,7 @@ Rectangle {
             color: root.active ? Theme.surface : root.foreground
             bold: true
         }
+
     }
 
     MouseArea {
@@ -53,6 +120,24 @@ Rectangle {
         onClicked: {
             if (root.enabled)
                 root.clicked();
+
         }
     }
+
+    Behavior on color {
+        ColorAnimation {
+            duration: 180
+            easing.type: Easing.OutCubic
+        }
+
+    }
+
+    Behavior on opacity {
+        NumberAnimation {
+            duration: 180
+            easing.type: Easing.OutCubic
+        }
+
+    }
+
 }

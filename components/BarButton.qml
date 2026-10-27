@@ -55,7 +55,54 @@ Item {
     Rectangle {
         anchors.fill: parent
         color: Theme.elevated
-        visible: root.dropdownOpen || mouse.containsMouse
+        opacity: root.dropdownOpen || mouse.containsMouse ? 1 : 0
+
+        Behavior on opacity {
+            NumberAnimation {
+                duration: 180
+                easing.type: Easing.OutCubic
+            }
+        }
+    }
+
+    property string shownIcon: ""
+    property string outgoingIcon: ""
+
+    onIconChanged: {
+        if (shownIcon === "" || icon === "") {
+            shownIcon = icon;
+            return;
+        }
+
+        if (icon !== shownIcon) {
+            outgoingIcon = shownIcon;
+            shownIcon = icon;
+            iconFade.restart();
+        }
+    }
+
+    Component.onCompleted: shownIcon = icon
+
+    ParallelAnimation {
+        id: iconFade
+
+        NumberAnimation {
+            target: outgoingGlyph
+            property: "opacity"
+            from: 1
+            to: 0
+            duration: 180
+            easing.type: Easing.OutCubic
+        }
+
+        NumberAnimation {
+            target: incomingGlyph
+            property: "opacity"
+            from: 0
+            to: 1
+            duration: 180
+            easing.type: Easing.OutCubic
+        }
     }
 
     Row {
@@ -64,13 +111,39 @@ Item {
         anchors.centerIn: parent
         spacing: Theme.iconGap
 
-        Text {
+        Item {
             anchors.verticalCenter: parent.verticalCenter
-            visible: root.icon !== ""
-            text: root.icon
-            color: root.iconColor
-            font.family: Theme.iconFontFamily
-            font.pixelSize: root.iconSize
+            visible: root.shownIcon !== ""
+            implicitWidth: Math.max(incomingGlyph.implicitWidth, iconFade.running ? outgoingGlyph.implicitWidth : 0)
+            implicitHeight: incomingGlyph.implicitHeight
+
+            Text {
+                id: outgoingGlyph
+
+                anchors.centerIn: parent
+                text: root.outgoingIcon
+                color: incomingGlyph.color
+                font.family: Theme.iconFontFamily
+                font.pixelSize: root.iconSize
+                opacity: 0
+            }
+
+            Text {
+                id: incomingGlyph
+
+                anchors.centerIn: parent
+                text: root.shownIcon
+                color: root.iconColor
+                font.family: Theme.iconFontFamily
+                font.pixelSize: root.iconSize
+
+                Behavior on color {
+                    ColorAnimation {
+                        duration: 180
+                        easing.type: Easing.OutCubic
+                    }
+                }
+            }
         }
 
         Text {

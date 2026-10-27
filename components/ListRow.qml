@@ -16,17 +16,26 @@ Rectangle {
     property bool clickable: true
     default property alias trailing: trailingRow.data
 
-    signal clicked
+    signal clicked()
 
     Layout.fillWidth: true
     implicitHeight: Math.max(40, column.implicitHeight + 12)
     color: mouse.containsMouse && clickable ? Theme.elevated : "transparent"
 
     Rectangle {
-        visible: root.highlighted
+        opacity: root.highlighted ? 1 : 0
         width: 3
         height: parent.height
         color: Theme.primary
+
+        Behavior on opacity {
+            NumberAnimation {
+                duration: 180
+                easing.type: Easing.OutCubic
+            }
+
+        }
+
     }
 
     RowLayout {
@@ -64,6 +73,7 @@ Rectangle {
                 color: Theme.fgMuted
                 font.pixelSize: Theme.fontSize - 2
             }
+
         }
 
         Row {
@@ -71,6 +81,7 @@ Rectangle {
 
             spacing: 4
         }
+
     }
 
     MouseArea {
@@ -83,6 +94,16 @@ Rectangle {
         onClicked: {
             if (root.clickable)
                 root.clicked();
+
         }
     }
+
+    Behavior on color {
+        ColorAnimation {
+            duration: 180
+            easing.type: Easing.OutCubic
+        }
+
+    }
+
 }
