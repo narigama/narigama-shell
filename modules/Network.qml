@@ -15,7 +15,7 @@ BarButton {
     icon: {
         const net = wired ? Icons.ethernet : !wifi ? Icons.lanDisconnect : !Networking.wifiEnabled ? Icons.wifiOff : wifi.state === ConnectionState.Connecting ? Icons.wifiAlert : wifiNetwork ? Icons.forWifiSignal(wifiNetwork.signalStrength) : Icons.wifiOffline;
 
-        return Vpn.connected || Vpn.connecting ? net + " " + Icons.shieldLock : net;
+        return Vpn.connected || Vpn.connecting ? net + "  " + Icons.shieldLock : net;
     }
     labelShow: false
     color: Vpn.connecting ? Theme.yellow : Vpn.connected ? Theme.green : Theme.primary

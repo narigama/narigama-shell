@@ -18,12 +18,13 @@ Singleton {
     readonly property bool protonBusy: protonProc.running || protonActivating
     property string protonServer: ""
     readonly property string protonCountry: protonServer.match(/^[A-Z]{2}/)?.[0] ?? ""
-    readonly property var defaultCountries: ["IE", "GB", "FR", "DE", "NL", "US"]
+    readonly property var defaultCountries: ["UK", "IE", "FR", "DE", "NL", "US"]
     property var protonCountries: defaultCountries
 
     // [{ id, uuid, name, kind ("wireguard" | "vpn"), state, connected, connecting, external }]
     property var profiles: []
     property string busyProfile: ""
+    property string busyProfileAction: ""
 
     readonly property bool available: hasProton || hasProtonApp || profiles.length > 0
     readonly property var activeConnections: [...(protonConnected ? ["Proton VPN" + (protonServer ? " (" + protonServer + ")" : "")] : []), ...profiles.filter(p => p.connected).map(p => p.name)]
@@ -32,7 +33,9 @@ Singleton {
     readonly property string activeName: activeConnections[0] ?? ""
 
     function refresh() {
-        if (!query.running)
+        if (query.running)
+            debounce.restart();
+        else
             query.running = true;
     }
 
@@ -45,7 +48,7 @@ Singleton {
             protonProc.command = ["protonvpn", "disconnect"];
         } else {
             protonAction = "connecting";
-            protonProc.command = ["protonvpn", "connect"];
+            protonProc.command = ["sh", "-c", "protonvpn connect || protonvpn connect --random"];
         }
 
         protonProc.running = true;
@@ -61,7 +64,7 @@ Singleton {
         }
 
         protonAction = "connecting";
-        protonProc.command = ["protonvpn", "connect", "--country", country];
+        protonProc.command = ["sh", "-c", "protonvpn connect --country " + country + " || protonvpn connect --country " + country + " --random"];
         protonProc.running = true;
     }
 
@@ -75,6 +78,7 @@ Singleton {
             return;
 
         busyProfile = profile.id;
+        busyProfileAction = profile.connected ? "disconnecting" : "connecting";
 
         if (profile.uuid !== "") {
             profileProc.command = ["nmcli", "connection", profile.connected ? "down" : "up", "uuid", profile.uuid];
@@ -137,6 +141,7 @@ Singleton {
 
         onExited: {
             root.busyProfile = "";
+            root.busyProfileAction = "";
             root.refresh();
         }
     }
@@ -176,6 +181,9 @@ Singleton {
                     } catch (e) {}
                 }
 
+                // NetworkManager marks proton0 "activated" as soon as the WireGuard netdev exists,
+                // before Proton VPN's local-agent handshake finishes and writes connection_persistence.json.
+                const protonReady = persistedUuid !== "" && root.protonAction !== "connecting";
                 let pConn = false;
                 let pAct = false;
                 let pServer = "";
@@ -204,7 +212,11 @@ Singleton {
                             nmDevices.add(device);
 
                         if (state === "activated") {
-                            pConn = true;
+                            if (protonReady)
+                                pConn = true;
+                            else
+                                pAct = true;
+
                             pServer = name.replace(/^ProtonVPN\s*/, "") || persistedServer;
                         } else if (state === "activating" || state === "deactivating") {
                             pAct = true;
@@ -245,7 +257,11 @@ Singleton {
                         continue;
 
                     if (iface === "proton0") {
-                        pConn = true;
+                        if (protonReady)
+                            pConn = true;
+                        else
+                            pAct = true;
+
                         pServer = pServer || persistedServer;
                         continue;
                     }

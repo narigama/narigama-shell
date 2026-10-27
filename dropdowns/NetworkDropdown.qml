@@ -48,17 +48,31 @@ ColumnLayout {
     width: 380
     spacing: 8
 
-    // Keep the wifi list fresh only while the dropdown is open.
+    // Keep the wifi list fresh only while the dropdown is open, but delay scanning when a cached
+    // list is already visible and pause during VPN handshakes so an off-channel iwd scan on wlan0
+    // cannot stall Proton VPN's 10s local-agent timeout.
     Component.onCompleted: {
         networks = sortedNetworks;
         Vpn.refresh();
-
-        if (wifi)
-            Qt.callLater(() => wifi.scannerEnabled = true);
     }
     Component.onDestruction: {
         if (wifi)
             wifi.scannerEnabled = false;
+    }
+
+    Timer {
+        interval: root.sortedNetworks.length > 0 ? 4000 : 0
+        running: root.wifi !== null && !Vpn.connecting
+        onTriggered: root.wifi.scannerEnabled = true
+    }
+
+    Connections {
+        target: Vpn
+
+        function onConnectingChanged() {
+            if (Vpn.connecting && root.wifi)
+                root.wifi.scannerEnabled = false;
+        }
     }
 
     SectionHeader {
@@ -120,7 +134,7 @@ ColumnLayout {
         icon: Vpn.protonConnected ? Icons.shieldLock : Icons.shieldOutline
         iconColor: Vpn.protonBusy ? Theme.yellow : Vpn.protonConnected ? Theme.green : Theme.fgMuted
         title: "Proton VPN"
-        subtitle: Vpn.protonBusy ? (Vpn.protonAction === "disconnecting" || Vpn.protonConnected ? "Disconnecting…" : "Connecting…") : Vpn.protonConnected ? "Connected" + (Vpn.protonServer ? " · " + Vpn.protonServer : "") : "Fastest server"
+        subtitle: Vpn.protonBusy ? (Vpn.protonAction === "disconnecting" ? "Disconnecting…" : "Connecting…" + (Vpn.protonServer ? " · " + Vpn.protonServer : "")) : Vpn.protonConnected ? "Connected" + (Vpn.protonServer ? " · " + Vpn.protonServer : "") : "Fastest server"
         highlighted: Vpn.protonConnected
         clickable: !Vpn.protonBusy
         onClicked: Vpn.toggleProton()
@@ -154,11 +168,12 @@ ColumnLayout {
         delegate: ListRow {
             required property var modelData
             readonly property bool busy: Vpn.busyProfile === modelData.id || modelData.connecting
+            readonly property bool disconnecting: Vpn.busyProfile === modelData.id ? Vpn.busyProfileAction === "disconnecting" : modelData.state === "deactivating"
 
             icon: modelData.connected ? Icons.shieldLock : Icons.shieldOutline
             iconColor: busy ? Theme.yellow : modelData.connected ? Theme.green : Theme.fgMuted
             title: modelData.name
-            subtitle: [modelData.kind === "wireguard" ? "WireGuard" : "VPN", busy ? (modelData.connected || modelData.state === "deactivating" ? "Disconnecting…" : "Connecting…") : modelData.connected ? "Connected" : ""].filter(t => t !== "").join(" · ")
+            subtitle: [modelData.kind === "wireguard" ? "WireGuard" : "VPN", busy ? (disconnecting ? "Disconnecting…" : "Connecting…") : modelData.connected ? "Connected" : ""].filter(t => t !== "").join(" · ")
             highlighted: modelData.connected
             clickable: !busy
             onClicked: Vpn.toggleProfile(modelData)
