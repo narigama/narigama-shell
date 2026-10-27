@@ -30,6 +30,7 @@ ColumnLayout {
                 color: Power.low ? Theme.red : Theme.green
                 bold: true
             }
+
         }
 
         Meter {
@@ -42,7 +43,6 @@ ColumnLayout {
             visible: text !== ""
             text: {
                 const parts = [];
-
                 if (root.battery && root.battery.changeRate !== 0)
                     parts.push(Math.abs(root.battery.changeRate).toFixed(1) + " W");
 
@@ -50,8 +50,9 @@ ColumnLayout {
                     parts.push(root.battery.energy.toFixed(1) + " of " + root.battery.energyCapacity.toFixed(1) + " Wh");
 
                 // Per battery, so not on the combined display device.
-                const health = UPower.devices.values.find(d => d.isLaptopBattery && d.healthSupported);
-
+                const health = UPower.devices.values.find((d) => {
+                    return d.isLaptopBattery && d.healthSupported;
+                });
                 if (health)
                     parts.push(Math.round(health.healthPercentage) + "% health");
 
@@ -60,6 +61,7 @@ ColumnLayout {
             color: Theme.fgSubtle
             font.pixelSize: Theme.fontSize - 2
         }
+
     }
 
     SectionHeader {
@@ -73,7 +75,9 @@ ColumnLayout {
 
         Repeater {
             // Touching PowerProfiles without the daemon only logs DBus warnings.
-            model: !Power.hasProfiles ? [] : Power.profiles.filter(p => p[0] !== PowerProfile.Performance || PowerProfiles.hasPerformanceProfile)
+            model: !Power.hasProfiles ? [] : Power.profiles.filter((p) => {
+                return p[0] !== PowerProfile.Performance || PowerProfiles.hasPerformanceProfile;
+            })
 
             delegate: IconButton {
                 required property var modelData
@@ -86,7 +90,9 @@ ColumnLayout {
                 background: Theme.surface
                 onClicked: PowerProfiles.profile = modelData[0]
             }
+
         }
+
     }
 
     StyledText {
@@ -100,7 +106,8 @@ ColumnLayout {
         visible: !Power.hasProfiles
         Layout.fillWidth: true
         text: Tools.hint("powerProfiles")
-        color: Theme.fgMuted
+        color: Theme.yellow
         wrapMode: Text.Wrap
     }
+
 }

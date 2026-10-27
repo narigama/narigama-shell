@@ -7,12 +7,19 @@ import qs.services
 ColumnLayout {
     width: 340
     spacing: 12
-
     // Picks up changes made elsewhere (monitor buttons, other tools).
     Component.onCompleted: Desk.refresh()
 
     StyledText {
-        visible: Desk.displays.length === 0
+        visible: !Tools.available("brightness")
+        Layout.fillWidth: true
+        text: Tools.hint("brightness")
+        color: Theme.yellow
+        wrapMode: Text.Wrap
+    }
+
+    StyledText {
+        visible: Tools.available("brightness") && Desk.displays.length === 0
         text: "No DDC/CI displays found"
         color: Theme.fgMuted
     }
@@ -42,14 +49,20 @@ ColumnLayout {
                     color: Theme.yellow
                     font.bold: true
                 }
+
             }
 
             Slider {
                 Layout.fillWidth: true
                 value: display.level / 100
                 accent: Theme.yellow
-                onMoved: value => Desk.setBrightness(display.modelData.bus, value * 100)
+                onMoved: (value) => {
+                    return Desk.setBrightness(display.modelData.bus, value * 100);
+                }
             }
+
         }
+
     }
+
 }

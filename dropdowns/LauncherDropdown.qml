@@ -18,9 +18,8 @@ ColumnLayout {
 
     function run(index) {
         const result = results[index];
-
         if (!result)
-            return;
+            return ;
 
         Dropdowns.close();
         result.run();
@@ -28,7 +27,7 @@ ColumnLayout {
 
     function move(delta) {
         if (results.length === 0)
-            return;
+            return ;
 
         selected = (selected + delta + results.length) % results.length;
         list.positionViewAtIndex(selected, ListView.Contain);
@@ -36,7 +35,6 @@ ColumnLayout {
 
     width: 560
     spacing: 8
-
     Component.onCompleted: Clipboard.refresh()
 
     // The dropdown panel takes focus as it opens, after this is created; take it back once settled.
@@ -57,12 +55,11 @@ ColumnLayout {
             list.positionViewAtBeginning();
         }
         onAccepted: root.run(root.selected)
-
         Keys.onUpPressed: root.move(-1)
         Keys.onDownPressed: root.move(1)
         Keys.onTabPressed: root.move(1)
         Keys.onBacktabPressed: root.move(-1)
-        Keys.onPressed: event => {
+        Keys.onPressed: (event) => {
             if (event.modifiers & Qt.ControlModifier && (event.key === Qt.Key_N || event.key === Qt.Key_J)) {
                 root.move(1);
                 event.accepted = true;
@@ -74,10 +71,14 @@ ColumnLayout {
     }
 
     StyledText {
+        readonly property bool missingClipboard: search.text.trim().startsWith(":") && Launcher.enabled("clipboard") && !Tools.available("clipboard")
+
         visible: root.results.length === 0 && search.text.trim() !== ""
         Layout.topMargin: 4
-        text: search.text.trim().startsWith(":") && Launcher.enabled("clipboard") && !Tools.available("clipboard") ? Tools.hint("clipboard") : "No matches"
-        color: Theme.fgMuted
+        Layout.fillWidth: true
+        text: missingClipboard ? Tools.hint("clipboard") : "No matches"
+        color: missingClipboard ? Theme.yellow : Theme.fgMuted
+        wrapMode: Text.Wrap
     }
 
     // Hidden while empty, or the column's spacing adds a gap below the search field.
@@ -129,7 +130,6 @@ ColumnLayout {
                     Item {
                         readonly property string iconSource: {
                             const icon = row.modelData.icon;
-
                             if (!icon)
                                 return "";
 
@@ -154,6 +154,7 @@ ColumnLayout {
                             font.family: Theme.iconFontFamily
                             font.pixelSize: 22
                         }
+
                     }
 
                     ColumnLayout {
@@ -174,19 +175,21 @@ ColumnLayout {
                             color: Theme.fgSubtle
                             font.pixelSize: Theme.fontSize - 3
                         }
+
                     }
 
                     StyledText {
                         text: ({
-                                "app": "",
-                                "window": "window",
-                                "calculator": "copy",
-                                "command": "run",
-                                "clipboard": "paste"
-                            })[row.modelData.kind] ?? ""
+                            "app": "",
+                            "window": "window",
+                            "calculator": "copy",
+                            "command": "run",
+                            "clipboard": "paste"
+                        })[row.modelData.kind] ?? ""
                         color: Theme.fgSubtle
                         font.pixelSize: Theme.fontSize - 3
                     }
+
                 }
 
                 MouseArea {
@@ -197,7 +200,11 @@ ColumnLayout {
                     cursorShape: Qt.PointingHandCursor
                     onClicked: root.run(row.index)
                 }
+
             }
+
         }
+
     }
+
 }

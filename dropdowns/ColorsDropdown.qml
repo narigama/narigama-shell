@@ -13,7 +13,15 @@ ColumnLayout {
     }
 
     StyledText {
-        visible: Capture.pickedColors.length === 0
+        visible: !Tools.available("colorPicker")
+        Layout.fillWidth: true
+        text: Tools.hint("colorPicker")
+        color: Theme.yellow
+        wrapMode: Text.Wrap
+    }
+
+    StyledText {
+        visible: Tools.available("colorPicker") && Capture.pickedColors.length === 0
         text: "Left click the picker to grab a colour"
         color: Theme.fgMuted
     }
@@ -61,7 +69,11 @@ ColumnLayout {
                     cursorShape: Qt.PointingHandCursor
                     onClicked: Capture.copyColor(parent.modelData)
                 }
+
             }
+
         }
+
     }
+
 }

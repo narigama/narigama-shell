@@ -28,7 +28,10 @@ Singleton {
             "wl-paste": "wl-clipboard",
             "gamemoded": "gamemode",
             "powerprofilesctl": "power-profiles-daemon",
-            "notify-send": "libnotify"
+            "notify-send": "libnotify",
+            "systemctl": "systemd",
+            "nmcli": "networkmanager",
+            "gsettings": distro === "debian" ? "libglib2.0-bin" : "glib2"
         })
 
     // Commands each module needs. Optional extras (satty, wf-recorder) are checked by the module.
@@ -44,7 +47,9 @@ Singleton {
             "powerProfiles": ["powerprofilesctl"]
         })
 
-    readonly property var checked: ["systemctl", "grim", "slurp", "wl-copy", "wl-paste", "satty", "wf-recorder", "cliphist", "hyprpicker", "ddcutil", "gamemoded", "brightnessctl", "powerprofilesctl", "notify-send", "pacman", "fakeroot", "paru", "yay", "apt", "dnf", "awww", "swaybg", "matugen", "vipsthumbnail", "magick", "nmcli", "protonvpn", "protonvpn-app", "wg-quick"]
+    readonly property var checked: ["systemctl", "grim", "slurp", "wl-copy", "wl-paste", "satty", "wf-recorder", "cliphist", "hyprpicker", "ddcutil", "gamemoded", "brightnessctl", "powerprofilesctl", "notify-send", "pacman", "fakeroot", "paru", "yay", "apt", "dnf", "awww", "swaybg", "matugen", "vipsthumbnail", "magick", "nmcli", "protonvpn", "protonvpn-app", "wg-quick", "gsettings"]
+
+    readonly property string terminalHint: terminalCommand.length > 0 ? "" : "Needs a terminal ($TERMINAL, xdg-terminal-exec, foot, kitty, alacritty…)"
 
     // Package manager used for update checks: "pacman", "apt", "dnf" or "".
     readonly property string packageManager: has("pacman") ? "pacman" : has("apt") ? "apt" : has("dnf") ? "dnf" : ""

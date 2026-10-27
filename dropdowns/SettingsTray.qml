@@ -12,6 +12,692 @@ GridLayout {
     columnSpacing: 32
     rowSpacing: 24
 
+    ColumnLayout {
+        Layout.alignment: Qt.AlignTop
+        Layout.fillWidth: true
+        Layout.preferredWidth: 1
+        spacing: 8
+
+        SectionHeader {
+            text: "Theme"
+        }
+
+        SettingRow {
+            label: "Dark mode"
+
+            Toggle {
+                checked: !Theme.light
+                onToggled: ShellState.toggleThemeMode()
+            }
+
+        }
+
+        SettingRow {
+            label: "Apply to apps"
+
+            Toggle {
+                visible: Tools.has("gsettings")
+                checked: ShellState.themeModeToApps
+                onToggled: {
+                    ShellState.themeModeToApps = !ShellState.themeModeToApps;
+                    Theme.applyToApps();
+                }
+            }
+
+        }
+
+        StyledText {
+            visible: !Tools.has("gsettings")
+            Layout.fillWidth: true
+            text: Tools.optionalHint("gsettings")
+            color: Theme.yellow
+            font.pixelSize: Theme.fontSize - 3
+            wrapMode: Text.Wrap
+        }
+
+        SectionHeader {
+            Layout.topMargin: 16
+            text: "Dark themes"
+        }
+
+        StyledText {
+            visible: Theme.fromWallpaper
+            Layout.fillWidth: true
+            text: "Colours currently come from the wallpaper (Wallpapers tab)"
+            color: Theme.yellow
+            font.pixelSize: Theme.fontSize - 2
+            wrapMode: Text.Wrap
+        }
+
+        GridLayout {
+            Layout.fillWidth: true
+            columns: 2
+            rowSpacing: 4
+            columnSpacing: 4
+
+            Repeater {
+                model: Themes.list.filter((t) => {
+                    return !t.light;
+                })
+
+                delegate: ThemeSwatch {
+                    required property var modelData
+
+                    theme: modelData
+                }
+
+            }
+
+        }
+
+        SectionHeader {
+            Layout.topMargin: 16
+            text: "Light themes"
+        }
+
+        GridLayout {
+            Layout.fillWidth: true
+            columns: 2
+            rowSpacing: 4
+            columnSpacing: 4
+
+            Repeater {
+                model: Themes.list.filter((t) => {
+                    return t.light;
+                })
+
+                delegate: ThemeSwatch {
+                    required property var modelData
+
+                    theme: modelData
+                }
+
+            }
+
+        }
+
+    }
+
+    ColumnLayout {
+        Layout.alignment: Qt.AlignTop
+        Layout.fillWidth: true
+        Layout.preferredWidth: 1
+        spacing: 8
+
+        SectionHeader {
+            text: "Bar"
+        }
+
+        SettingRow {
+            label: "Position"
+
+            Row {
+                spacing: 4
+
+                Repeater {
+                    model: [["top", "Top"], ["bottom", "Bottom"]]
+
+                    delegate: IconButton {
+                        required property var modelData
+
+                        text: modelData[1]
+                        implicitHeight: 26
+                        active: ShellState.barPosition === modelData[0]
+                        background: Theme.surface
+                        onClicked: ShellState.barPosition = modelData[0]
+                    }
+
+                }
+
+            }
+
+        }
+
+        SectionHeader {
+            Layout.topMargin: 16
+            text: "Bar modules"
+        }
+
+        StyledText {
+            Layout.fillWidth: true
+            text: "Drag to reorder or move between groups"
+            color: Theme.fgSubtle
+            font.pixelSize: Theme.fontSize - 3
+        }
+
+        ModuleLayoutEditor {
+            Layout.fillWidth: true
+        }
+
+    }
+
+    ColumnLayout {
+        Layout.alignment: Qt.AlignTop
+        Layout.fillWidth: true
+        Layout.preferredWidth: 1
+        spacing: 8
+
+        SectionHeader {
+            text: "Workspace labels"
+        }
+
+        Repeater {
+            model: WorkspaceLabels.styles
+
+            delegate: ListRow {
+                required property var modelData
+
+                implicitHeight: 34
+                title: modelData[1]
+                highlighted: ShellState.workspaceLabels === modelData[0]
+                onClicked: ShellState.workspaceLabels = modelData[0]
+
+                StyledText {
+                    text: modelData[2]
+                    color: ShellState.workspaceLabels === modelData[0] ? Theme.primary : Theme.fgMuted
+                    font.bold: true
+                }
+
+            }
+
+        }
+
+        RowLayout {
+            visible: ShellState.workspaceLabels === "custom"
+            Layout.fillWidth: true
+            spacing: 8
+
+            TextField {
+                id: customLabels
+
+                Layout.fillWidth: true
+                text: ShellState.workspaceCustomLabels
+                placeholder: "web, code, chat, …"
+                onAccepted: applyLabels.clicked()
+            }
+
+            IconButton {
+                id: applyLabels
+
+                text: "Set"
+                foreground: Theme.primary
+                enabled: customLabels.text !== ShellState.workspaceCustomLabels
+                onClicked: ShellState.workspaceCustomLabels = customLabels.text
+            }
+
+        }
+
+        SectionHeader {
+            Layout.topMargin: 16
+            text: "Clock"
+        }
+
+        SettingRow {
+            label: "Show seconds"
+
+            Toggle {
+                checked: ShellState.clockSeconds
+                onToggled: ShellState.clockSeconds = !ShellState.clockSeconds
+            }
+
+        }
+
+        SettingRow {
+            label: "24-hour"
+
+            Toggle {
+                checked: ShellState.clock24h
+                onToggled: ShellState.clock24h = !ShellState.clock24h
+            }
+
+        }
+
+        SettingRow {
+            label: "Secondary offset"
+
+            Stepper {
+                value: Math.max(0, ShellState.clockOffsets.findIndex((m) => {
+                    return m >= ShellState.clockOffset;
+                }))
+                from: 0
+                to: ShellState.clockOffsets.length - 1
+                text: ShellState.formatOffset(ShellState.clockOffset)
+                onChanged: (value) => {
+                    return ShellState.clockOffset = ShellState.clockOffsets[value];
+                }
+            }
+
+        }
+
+        SectionHeader {
+            Layout.topMargin: 16
+            text: "Launcher"
+        }
+
+        StyledText {
+            text: "Position when opened from a key"
+            color: Theme.fgMuted
+            font.pixelSize: Theme.fontSize - 2
+        }
+
+        RowLayout {
+            Layout.fillWidth: true
+            spacing: 4
+
+            Repeater {
+                model: [["left", "Left"], ["center", "Centre"], ["right", "Right"], ["floating", "Floating"]]
+
+                delegate: IconButton {
+                    required property var modelData
+
+                    Layout.fillWidth: true
+                    text: modelData[1]
+                    implicitHeight: 26
+                    active: ShellState.launcherPosition === modelData[0]
+                    background: Theme.surface
+                    onClicked: ShellState.launcherPosition = modelData[0]
+                }
+
+            }
+
+        }
+
+        Repeater {
+            model: ShellState.launcherCategories
+
+            delegate: ColumnLayout {
+                id: categoryRow
+
+                required property var modelData
+                readonly property string hint: modelData[0] === "clipboard" ? Tools.hint("clipboard") : modelData[0] === "calculator" ? Tools.optionalHint("wl-copy") : ""
+
+                Layout.fillWidth: true
+                spacing: 0
+
+                SettingRow {
+                    label: categoryRow.modelData[1]
+
+                    Toggle {
+                        visible: categoryRow.hint === ""
+                        checked: !ShellState.launcherDisabled.includes(categoryRow.modelData[0])
+                        onToggled: ShellState.launcherDisabled = checked ? ShellState.launcherDisabled.concat([categoryRow.modelData[0]]) : ShellState.launcherDisabled.filter((c) => {
+                            return c !== categoryRow.modelData[0];
+                        })
+                    }
+
+                }
+
+                StyledText {
+                    visible: categoryRow.hint !== ""
+                    Layout.fillWidth: true
+                    text: categoryRow.hint
+                    color: Theme.yellow
+                    font.pixelSize: Theme.fontSize - 3
+                    wrapMode: Text.Wrap
+                }
+
+            }
+
+        }
+
+        SectionHeader {
+            Layout.topMargin: 16
+            text: "Lock screen"
+        }
+
+        SettingRow {
+            label: "Lock when idle"
+
+            Toggle {
+                checked: ShellState.lockOnIdle
+                onToggled: ShellState.lockOnIdle = !ShellState.lockOnIdle
+            }
+
+        }
+
+        SettingRow {
+            visible: ShellState.lockOnIdle
+            label: "After"
+
+            Stepper {
+                value: ShellState.lockIdleMinutes
+                from: 1
+                to: 120
+                suffix: " min"
+                onChanged: (value) => {
+                    return ShellState.lockIdleMinutes = value;
+                }
+            }
+
+        }
+
+        SettingRow {
+            label: "Lock before suspend"
+
+            Toggle {
+                checked: ShellState.lockBeforeSleep
+                onToggled: ShellState.lockBeforeSleep = !ShellState.lockBeforeSleep
+            }
+
+        }
+
+        SettingRow {
+            label: "Background"
+
+            Row {
+                spacing: 4
+
+                Repeater {
+                    model: [["wallpaper", "Wallpaper"], ["desktop", "Desktop"]]
+
+                    delegate: IconButton {
+                        required property var modelData
+
+                        text: modelData[1]
+                        implicitHeight: 26
+                        active: ShellState.lockBackground === modelData[0]
+                        background: Theme.surface
+                        onClicked: ShellState.lockBackground = modelData[0]
+                    }
+
+                }
+
+            }
+
+        }
+
+        SettingRow {
+            label: "Effect"
+
+            Row {
+                spacing: 4
+
+                Repeater {
+                    model: [["blur", "Blur"], ["pixelate", "Pixelate"], ["none", "None"]]
+
+                    delegate: IconButton {
+                        required property var modelData
+
+                        text: modelData[1]
+                        implicitHeight: 26
+                        active: ShellState.lockEffect === modelData[0]
+                        background: Theme.surface
+                        onClicked: ShellState.lockEffect = modelData[0]
+                    }
+
+                }
+
+            }
+
+        }
+
+        SettingRow {
+            visible: ShellState.lockEffect !== "none"
+            label: "Strength"
+
+            Stepper {
+                value: ShellState.lockEffectStrength
+                from: 1
+                to: 10
+                onChanged: (value) => {
+                    return ShellState.lockEffectStrength = value;
+                }
+            }
+
+        }
+
+        SettingRow {
+            label: "Show notification count"
+
+            Toggle {
+                checked: ShellState.lockShowNotifications
+                onToggled: ShellState.lockShowNotifications = !ShellState.lockShowNotifications
+            }
+
+        }
+
+        StyledText {
+            visible: ShellState.lockBackground === "desktop" && !Tools.has("grim")
+            Layout.fillWidth: true
+            text: "Desktop background " + Tools.optionalHint("grim").toLowerCase() + "; the wallpaper is used meanwhile"
+            color: Theme.yellow
+            font.pixelSize: Theme.fontSize - 3
+            wrapMode: Text.Wrap
+        }
+
+    }
+
+    ColumnLayout {
+        Layout.alignment: Qt.AlignTop
+        Layout.fillWidth: true
+        Layout.preferredWidth: 1
+        spacing: 8
+
+        SectionHeader {
+            text: "Appearance"
+        }
+
+        FontPicker {
+            label: "Text font"
+            current: ShellState.fontFamily
+            fonts: Fonts.textFonts
+            onPicked: (family) => {
+                return ShellState.fontFamily = family;
+            }
+        }
+
+        FontPicker {
+            label: "Icon font"
+            current: ShellState.iconFontFamily
+            fonts: Fonts.iconFonts
+            sample: "  " + [Icons.calendarClock, Icons.cpu, Icons.bell, Icons.forDistro(Tools.distroId)].join(" ")
+            onPicked: (family) => {
+                return ShellState.iconFontFamily = family;
+            }
+        }
+
+        SettingRow {
+            label: "Font size"
+
+            Stepper {
+                value: ShellState.fontSize
+                from: 10
+                to: 24
+                suffix: "px"
+                onChanged: (value) => {
+                    return ShellState.fontSize = value;
+                }
+            }
+
+        }
+
+        SettingRow {
+            label: "Icon size"
+
+            Stepper {
+                value: ShellState.iconSize
+                from: 14
+                to: 36
+                suffix: "px"
+                onChanged: (value) => {
+                    return ShellState.iconSize = value;
+                }
+            }
+
+        }
+
+        SettingRow {
+            label: "On-screen popups (volume, media…)"
+
+            Toggle {
+                checked: ShellState.osdEnabled
+                onToggled: ShellState.osdEnabled = !ShellState.osdEnabled
+            }
+
+        }
+
+    }
+
+    ColumnLayout {
+        Layout.alignment: Qt.AlignTop
+        Layout.fillWidth: true
+        Layout.preferredWidth: 1
+        spacing: 8
+
+        SectionHeader {
+            text: "Weather"
+        }
+
+        RowLayout {
+            Layout.fillWidth: true
+            spacing: 8
+
+            TextField {
+                id: location
+
+                Layout.fillWidth: true
+                text: ShellState.weatherLocation
+                placeholder: "City"
+                onAccepted: applyLocation.clicked()
+            }
+
+            IconButton {
+                id: applyLocation
+
+                text: "Set"
+                foreground: Theme.primary
+                enabled: location.text.trim() !== "" && location.text.trim() !== ShellState.weatherLocation
+                onClicked: ShellState.weatherLocation = location.text.trim()
+            }
+
+        }
+
+        StyledText {
+            visible: ShellState.weatherLocation === ""
+            Layout.fillWidth: true
+            text: "Set a city to show the weather"
+            color: Theme.yellow
+            font.pixelSize: Theme.fontSize - 2
+        }
+
+        StyledText {
+            visible: Weather.error !== ""
+            Layout.fillWidth: true
+            text: Weather.error
+            color: Theme.red
+            font.pixelSize: Theme.fontSize - 2
+        }
+
+        SectionHeader {
+            Layout.topMargin: 16
+            text: "Notifications"
+        }
+
+        SettingRow {
+            label: "Popup duration"
+
+            Stepper {
+                value: ShellState.popupSeconds
+                from: 1
+                to: 30
+                suffix: "s"
+                onChanged: (value) => {
+                    return ShellState.popupSeconds = value;
+                }
+            }
+
+        }
+
+        StyledText {
+            Layout.topMargin: 4
+            text: "Popup position"
+            color: Theme.fgMuted
+            font.pixelSize: Theme.fontSize - 2
+        }
+
+        Repeater {
+            model: [["top", "Top"], ["bottom", "Bottom"]]
+
+            delegate: RowLayout {
+                id: positionRow
+
+                required property var modelData
+
+                Layout.fillWidth: true
+                spacing: 4
+
+                StyledText {
+                    Layout.preferredWidth: 64
+                    text: positionRow.modelData[1]
+                    color: Theme.fgMuted
+                }
+
+                Repeater {
+                    model: [["left", "Left"], ["center", "Centre"], ["right", "Right"]]
+
+                    delegate: IconButton {
+                        required property var modelData
+                        readonly property string position: positionRow.modelData[0] + "-" + modelData[0]
+
+                        Layout.fillWidth: true
+                        text: modelData[1]
+                        implicitHeight: 26
+                        active: ShellState.popupPosition === position
+                        background: Theme.surface
+                        onClicked: ShellState.popupPosition = position
+                    }
+
+                }
+
+            }
+
+        }
+
+        SettingRow {
+            label: "Popups shown at once"
+
+            Stepper {
+                value: ShellState.popupMax
+                from: 1
+                to: 10
+                onChanged: (value) => {
+                    return ShellState.popupMax = value;
+                }
+            }
+
+        }
+
+        StyledText {
+            visible: ShellState.mutedApps.length > 0
+            Layout.topMargin: 4
+            text: "Muted apps (history only, no popups)"
+            color: Theme.fgMuted
+            font.pixelSize: Theme.fontSize - 2
+        }
+
+        Repeater {
+            model: ShellState.mutedApps
+
+            delegate: ListRow {
+                required property string modelData
+
+                implicitHeight: 34
+                icon: Icons.bellOff
+                iconColor: Theme.red
+                title: modelData
+                onClicked: Notifications.setMuted(modelData, false)
+
+                StyledText {
+                    text: "Unmute"
+                    color: Theme.primary
+                }
+
+            }
+
+        }
+
+    }
+
     component SettingRow: RowLayout {
         property string label
         default property alias control: controlSlot.data
@@ -30,6 +716,7 @@ GridLayout {
             implicitWidth: childrenRect.width
             implicitHeight: childrenRect.height
         }
+
     }
 
     component ThemeSwatch: Rectangle {
@@ -74,7 +761,9 @@ GridLayout {
                     height: 14
                     color: swatch.theme.colors[modelData]
                 }
+
             }
+
         }
 
         MouseArea {
@@ -85,592 +774,7 @@ GridLayout {
             cursorShape: Qt.PointingHandCursor
             onClicked: ShellState.theme = swatch.theme.id
         }
+
     }
 
-    ColumnLayout {
-        Layout.alignment: Qt.AlignTop
-        Layout.fillWidth: true
-        Layout.preferredWidth: 1
-        spacing: 8
-
-        SectionHeader {
-            text: "Theme"
-        }
-
-        SettingRow {
-            label: "Dark mode"
-
-            Toggle {
-                checked: !Theme.light
-                onToggled: ShellState.toggleThemeMode()
-            }
-        }
-
-        SettingRow {
-            label: "Apply to apps"
-
-            Toggle {
-                checked: ShellState.themeModeToApps
-                onToggled: {
-                    ShellState.themeModeToApps = !ShellState.themeModeToApps;
-                    Theme.applyToApps();
-                }
-            }
-        }
-
-        SectionHeader {
-            Layout.topMargin: 16
-            text: "Dark themes"
-        }
-
-        StyledText {
-            visible: Theme.fromWallpaper
-            Layout.fillWidth: true
-            text: "Colours currently come from the wallpaper (Wallpapers tab)"
-            color: Theme.yellow
-            font.pixelSize: Theme.fontSize - 2
-            wrapMode: Text.Wrap
-        }
-
-        GridLayout {
-            Layout.fillWidth: true
-            columns: 2
-            rowSpacing: 4
-            columnSpacing: 4
-
-            Repeater {
-                model: Themes.list.filter(t => !t.light)
-
-                delegate: ThemeSwatch {
-                    required property var modelData
-
-                    theme: modelData
-                }
-            }
-        }
-
-        SectionHeader {
-            Layout.topMargin: 16
-            text: "Light themes"
-        }
-
-        GridLayout {
-            Layout.fillWidth: true
-            columns: 2
-            rowSpacing: 4
-            columnSpacing: 4
-
-            Repeater {
-                model: Themes.list.filter(t => t.light)
-
-                delegate: ThemeSwatch {
-                    required property var modelData
-
-                    theme: modelData
-                }
-            }
-        }
-    }
-
-    ColumnLayout {
-        Layout.alignment: Qt.AlignTop
-        Layout.fillWidth: true
-        Layout.preferredWidth: 1
-        spacing: 8
-
-        SectionHeader {
-            text: "Bar"
-        }
-
-        SettingRow {
-            label: "Position"
-
-            Row {
-                spacing: 4
-
-                Repeater {
-                    model: [["top", "Top"], ["bottom", "Bottom"]]
-
-                    delegate: IconButton {
-                        required property var modelData
-
-                        text: modelData[1]
-                        implicitHeight: 26
-                        active: ShellState.barPosition === modelData[0]
-                        background: Theme.surface
-                        onClicked: ShellState.barPosition = modelData[0]
-                    }
-                }
-            }
-        }
-
-        SectionHeader {
-            Layout.topMargin: 16
-            text: "Bar modules"
-        }
-
-        StyledText {
-            Layout.fillWidth: true
-            text: "Drag to reorder or move between groups"
-            color: Theme.fgSubtle
-            font.pixelSize: Theme.fontSize - 3
-        }
-
-        ModuleLayoutEditor {
-            Layout.fillWidth: true
-        }
-    }
-
-    ColumnLayout {
-        Layout.alignment: Qt.AlignTop
-        Layout.fillWidth: true
-        Layout.preferredWidth: 1
-        spacing: 8
-
-        SectionHeader {
-            text: "Workspace labels"
-        }
-
-        Repeater {
-            model: WorkspaceLabels.styles
-
-            delegate: ListRow {
-                required property var modelData
-
-                implicitHeight: 34
-                title: modelData[1]
-                highlighted: ShellState.workspaceLabels === modelData[0]
-                onClicked: ShellState.workspaceLabels = modelData[0]
-
-                StyledText {
-                    text: modelData[2]
-                    color: ShellState.workspaceLabels === modelData[0] ? Theme.primary : Theme.fgMuted
-                    font.bold: true
-                }
-            }
-        }
-
-        RowLayout {
-            visible: ShellState.workspaceLabels === "custom"
-            Layout.fillWidth: true
-            spacing: 8
-
-            TextField {
-                id: customLabels
-
-                Layout.fillWidth: true
-                text: ShellState.workspaceCustomLabels
-                placeholder: "web, code, chat, …"
-                onAccepted: applyLabels.clicked()
-            }
-
-            IconButton {
-                id: applyLabels
-
-                text: "Set"
-                foreground: Theme.primary
-                enabled: customLabels.text !== ShellState.workspaceCustomLabels
-                onClicked: ShellState.workspaceCustomLabels = customLabels.text
-            }
-        }
-
-        SectionHeader {
-            Layout.topMargin: 16
-            text: "Clock"
-        }
-
-        SettingRow {
-            label: "Show seconds"
-
-            Toggle {
-                checked: ShellState.clockSeconds
-                onToggled: ShellState.clockSeconds = !ShellState.clockSeconds
-            }
-        }
-
-        SettingRow {
-            label: "24-hour"
-
-            Toggle {
-                checked: ShellState.clock24h
-                onToggled: ShellState.clock24h = !ShellState.clock24h
-            }
-        }
-
-        SettingRow {
-            label: "Secondary offset"
-
-            Stepper {
-                value: Math.max(0, ShellState.clockOffsets.findIndex(m => m >= ShellState.clockOffset))
-                from: 0
-                to: ShellState.clockOffsets.length - 1
-                text: ShellState.formatOffset(ShellState.clockOffset)
-                onChanged: value => ShellState.clockOffset = ShellState.clockOffsets[value]
-            }
-        }
-
-        SectionHeader {
-            Layout.topMargin: 16
-            text: "Launcher"
-        }
-
-        StyledText {
-            text: "Position when opened from a key"
-            color: Theme.fgMuted
-            font.pixelSize: Theme.fontSize - 2
-        }
-
-        RowLayout {
-            Layout.fillWidth: true
-            spacing: 4
-
-            Repeater {
-                model: [["left", "Left"], ["center", "Centre"], ["right", "Right"], ["floating", "Floating"]]
-
-                delegate: IconButton {
-                    required property var modelData
-
-                    Layout.fillWidth: true
-                    text: modelData[1]
-                    implicitHeight: 26
-                    active: ShellState.launcherPosition === modelData[0]
-                    background: Theme.surface
-                    onClicked: ShellState.launcherPosition = modelData[0]
-                }
-            }
-        }
-
-        Repeater {
-            model: ShellState.launcherCategories
-
-            delegate: SettingRow {
-                id: categoryRow
-
-                required property var modelData
-
-                label: modelData[1]
-
-                Toggle {
-                    checked: !ShellState.launcherDisabled.includes(categoryRow.modelData[0])
-                    onToggled: ShellState.launcherDisabled = checked ? ShellState.launcherDisabled.concat([categoryRow.modelData[0]]) : ShellState.launcherDisabled.filter(c => c !== categoryRow.modelData[0])
-                }
-            }
-        }
-
-        SectionHeader {
-            Layout.topMargin: 16
-            text: "Lock screen"
-        }
-
-        SettingRow {
-            label: "Lock when idle"
-
-            Toggle {
-                checked: ShellState.lockOnIdle
-                onToggled: ShellState.lockOnIdle = !ShellState.lockOnIdle
-            }
-        }
-
-        SettingRow {
-            visible: ShellState.lockOnIdle
-            label: "After"
-
-            Stepper {
-                value: ShellState.lockIdleMinutes
-                from: 1
-                to: 120
-                suffix: " min"
-                onChanged: value => ShellState.lockIdleMinutes = value
-            }
-        }
-
-        SettingRow {
-            label: "Lock before suspend"
-
-            Toggle {
-                checked: ShellState.lockBeforeSleep
-                onToggled: ShellState.lockBeforeSleep = !ShellState.lockBeforeSleep
-            }
-        }
-
-        SettingRow {
-            label: "Background"
-
-            Row {
-                spacing: 4
-
-                Repeater {
-                    model: [["wallpaper", "Wallpaper"], ["desktop", "Desktop"]]
-
-                    delegate: IconButton {
-                        required property var modelData
-
-                        text: modelData[1]
-                        implicitHeight: 26
-                        active: ShellState.lockBackground === modelData[0]
-                        background: Theme.surface
-                        onClicked: ShellState.lockBackground = modelData[0]
-                    }
-                }
-            }
-        }
-
-        SettingRow {
-            label: "Effect"
-
-            Row {
-                spacing: 4
-
-                Repeater {
-                    model: [["blur", "Blur"], ["pixelate", "Pixelate"], ["none", "None"]]
-
-                    delegate: IconButton {
-                        required property var modelData
-
-                        text: modelData[1]
-                        implicitHeight: 26
-                        active: ShellState.lockEffect === modelData[0]
-                        background: Theme.surface
-                        onClicked: ShellState.lockEffect = modelData[0]
-                    }
-                }
-            }
-        }
-
-        SettingRow {
-            visible: ShellState.lockEffect !== "none"
-            label: "Strength"
-
-            Stepper {
-                value: ShellState.lockEffectStrength
-                from: 1
-                to: 10
-                onChanged: value => ShellState.lockEffectStrength = value
-            }
-        }
-
-        SettingRow {
-            label: "Show notification count"
-
-            Toggle {
-                checked: ShellState.lockShowNotifications
-                onToggled: ShellState.lockShowNotifications = !ShellState.lockShowNotifications
-            }
-        }
-
-        StyledText {
-            visible: ShellState.lockBackground === "desktop" && !Tools.has("grim")
-            Layout.fillWidth: true
-            text: "Desktop background " + Tools.optionalHint("grim").toLowerCase() + "; the wallpaper is used meanwhile"
-            color: Theme.yellow
-            font.pixelSize: Theme.fontSize - 3
-            wrapMode: Text.Wrap
-        }
-    }
-
-    ColumnLayout {
-        Layout.alignment: Qt.AlignTop
-        Layout.fillWidth: true
-        Layout.preferredWidth: 1
-        spacing: 8
-
-        SectionHeader {
-            text: "Appearance"
-        }
-
-        FontPicker {
-            label: "Text font"
-            current: ShellState.fontFamily
-            fonts: Fonts.textFonts
-            onPicked: family => ShellState.fontFamily = family
-        }
-
-        FontPicker {
-            label: "Icon font"
-            current: ShellState.iconFontFamily
-            fonts: Fonts.iconFonts
-            sample: "  " + [Icons.calendarClock, Icons.cpu, Icons.bell, Icons.forDistro(Tools.distroId)].join(" ")
-            onPicked: family => ShellState.iconFontFamily = family
-        }
-
-        SettingRow {
-            label: "Font size"
-
-            Stepper {
-                value: ShellState.fontSize
-                from: 10
-                to: 24
-                suffix: "px"
-                onChanged: value => ShellState.fontSize = value
-            }
-        }
-
-        SettingRow {
-            label: "Icon size"
-
-            Stepper {
-                value: ShellState.iconSize
-                from: 14
-                to: 36
-                suffix: "px"
-                onChanged: value => ShellState.iconSize = value
-            }
-        }
-
-        SettingRow {
-            label: "On-screen popups (volume, media…)"
-
-            Toggle {
-                checked: ShellState.osdEnabled
-                onToggled: ShellState.osdEnabled = !ShellState.osdEnabled
-            }
-        }
-    }
-
-    ColumnLayout {
-        Layout.alignment: Qt.AlignTop
-        Layout.fillWidth: true
-        Layout.preferredWidth: 1
-        spacing: 8
-
-        SectionHeader {
-            text: "Weather"
-        }
-
-        RowLayout {
-            Layout.fillWidth: true
-            spacing: 8
-
-            TextField {
-                id: location
-
-                Layout.fillWidth: true
-                text: ShellState.weatherLocation
-                placeholder: "City"
-                onAccepted: applyLocation.clicked()
-            }
-
-            IconButton {
-                id: applyLocation
-
-                text: "Set"
-                foreground: Theme.primary
-                enabled: location.text.trim() !== "" && location.text.trim() !== ShellState.weatherLocation
-                onClicked: ShellState.weatherLocation = location.text.trim()
-            }
-        }
-
-        StyledText {
-            visible: ShellState.weatherLocation === ""
-            Layout.fillWidth: true
-            text: "Set a city to show the weather"
-            color: Theme.yellow
-            font.pixelSize: Theme.fontSize - 2
-        }
-
-        StyledText {
-            visible: Weather.error !== ""
-            Layout.fillWidth: true
-            text: Weather.error
-            color: Theme.red
-            font.pixelSize: Theme.fontSize - 2
-        }
-
-        SectionHeader {
-            Layout.topMargin: 16
-            text: "Notifications"
-        }
-
-        SettingRow {
-            label: "Popup duration"
-
-            Stepper {
-                value: ShellState.popupSeconds
-                from: 1
-                to: 30
-                suffix: "s"
-                onChanged: value => ShellState.popupSeconds = value
-            }
-        }
-
-        StyledText {
-            Layout.topMargin: 4
-            text: "Popup position"
-            color: Theme.fgMuted
-            font.pixelSize: Theme.fontSize - 2
-        }
-
-        Repeater {
-            model: [["top", "Top"], ["bottom", "Bottom"]]
-
-            delegate: RowLayout {
-                id: positionRow
-
-                required property var modelData
-
-                Layout.fillWidth: true
-                spacing: 4
-
-                StyledText {
-                    Layout.preferredWidth: 64
-                    text: positionRow.modelData[1]
-                    color: Theme.fgMuted
-                }
-
-                Repeater {
-                    model: [["left", "Left"], ["center", "Centre"], ["right", "Right"]]
-
-                    delegate: IconButton {
-                        required property var modelData
-                        readonly property string position: positionRow.modelData[0] + "-" + modelData[0]
-
-                        Layout.fillWidth: true
-                        text: modelData[1]
-                        implicitHeight: 26
-                        active: ShellState.popupPosition === position
-                        background: Theme.surface
-                        onClicked: ShellState.popupPosition = position
-                    }
-                }
-            }
-        }
-
-        SettingRow {
-            label: "Popups shown at once"
-
-            Stepper {
-                value: ShellState.popupMax
-                from: 1
-                to: 10
-                onChanged: value => ShellState.popupMax = value
-            }
-        }
-
-        StyledText {
-            visible: ShellState.mutedApps.length > 0
-            Layout.topMargin: 4
-            text: "Muted apps (history only, no popups)"
-            color: Theme.fgMuted
-            font.pixelSize: Theme.fontSize - 2
-        }
-
-        Repeater {
-            model: ShellState.mutedApps
-
-            delegate: ListRow {
-                required property string modelData
-
-                implicitHeight: 34
-                icon: Icons.bellOff
-                iconColor: Theme.red
-                title: modelData
-                onClicked: Notifications.setMuted(modelData, false)
-
-                StyledText {
-                    text: "Unmute"
-                    color: Theme.primary
-                }
-            }
-        }
-    }
 }

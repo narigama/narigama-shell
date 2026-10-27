@@ -18,9 +18,18 @@ ColumnLayout {
             iconSize: Theme.fontSize + 2
             implicitHeight: 26
             foreground: Theme.fgMuted
-            enabled: !SystemHealth.checkingUpdates
+            enabled: Tools.available("updates") && !SystemHealth.checkingUpdates
             onClicked: SystemHealth.checkUpdates()
         }
+
+    }
+
+    StyledText {
+        visible: !Tools.available("updates")
+        Layout.fillWidth: true
+        text: Tools.hint("updates")
+        color: Theme.yellow
+        wrapMode: Text.Wrap
     }
 
     StyledText {
@@ -51,7 +60,9 @@ ColumnLayout {
                 elide: Text.ElideLeft
                 Layout.maximumWidth: 220
             }
+
         }
+
     }
 
     StyledText {
@@ -61,15 +72,27 @@ ColumnLayout {
     }
 
     IconButton {
+        visible: Tools.available("updates")
         Layout.fillWidth: true
         Layout.topMargin: 4
         icon: Icons.terminal
         text: "Update in terminal"
         foreground: Theme.primary
         background: Theme.surface
+        enabled: Tools.terminalCommand.length > 0
         onClicked: {
             Dropdowns.close();
             SystemHealth.runUpdate();
         }
     }
+
+    StyledText {
+        visible: Tools.available("updates") && Tools.terminalHint !== ""
+        Layout.fillWidth: true
+        text: Tools.terminalHint
+        color: Theme.yellow
+        font.pixelSize: Theme.fontSize - 2
+        wrapMode: Text.Wrap
+    }
+
 }

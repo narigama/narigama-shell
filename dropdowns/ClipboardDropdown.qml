@@ -7,11 +7,12 @@ import qs.services
 ColumnLayout {
     id: root
 
-    readonly property var filtered: search.text === "" ? Clipboard.entries : Clipboard.entries.filter(e => e.text.toLowerCase().includes(search.text.toLowerCase()))
+    readonly property var filtered: search.text === "" ? Clipboard.entries : Clipboard.entries.filter((e) => {
+        return e.text.toLowerCase().includes(search.text.toLowerCase());
+    })
 
     width: 440
     spacing: 4
-
     Component.onCompleted: Clipboard.refresh()
 
     RowLayout {
@@ -46,9 +47,8 @@ ColumnLayout {
                 if (!armed) {
                     armed = true;
                     disarm.restart();
-                    return;
+                    return ;
                 }
-
                 armed = false;
                 Clipboard.clear();
             }
@@ -59,11 +59,22 @@ ColumnLayout {
                 interval: 3000
                 onTriggered: clearButton.armed = false
             }
+
         }
+
     }
 
     StyledText {
-        visible: !Clipboard.watching
+        visible: !Tools.available("clipboard")
+        Layout.fillWidth: true
+        text: Tools.hint("clipboard")
+        color: Theme.yellow
+        font.pixelSize: Theme.fontSize - 2
+        wrapMode: Text.Wrap
+    }
+
+    StyledText {
+        visible: Tools.available("clipboard") && !Clipboard.watching
         Layout.fillWidth: true
         text: "Nothing is recording history. Start it from your compositor's autostart: wl-paste --watch cliphist store"
         color: Theme.yellow
@@ -72,7 +83,7 @@ ColumnLayout {
     }
 
     StyledText {
-        visible: root.filtered.length === 0
+        visible: Tools.available("clipboard") && root.filtered.length === 0
         Layout.topMargin: 8
         text: Clipboard.entries.length === 0 ? "History is empty" : "No matches"
         color: Theme.fgMuted
@@ -102,6 +113,9 @@ ColumnLayout {
                 foreground: Theme.fgMuted
                 onClicked: Clipboard.remove(entryRow.modelData)
             }
+
         }
+
     }
+
 }

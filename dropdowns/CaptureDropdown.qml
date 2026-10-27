@@ -21,13 +21,25 @@ ColumnLayout {
         text: "Screenshot"
     }
 
+    StyledText {
+        visible: !Tools.available("capture")
+        Layout.leftMargin: 12
+        Layout.fillWidth: true
+        text: Tools.hint("capture")
+        color: Theme.yellow
+        font.pixelSize: Theme.fontSize - 3
+        wrapMode: Text.Wrap
+    }
+
     ListRow {
+        visible: Tools.available("capture")
         icon: Icons.crop
         title: "Region"
         onClicked: root.run(() => Capture.screenshot(""))
     }
 
     ListRow {
+        visible: Tools.available("capture")
         icon: Icons.monitor
         title: "Screen"
         subtitle: root.screenName
