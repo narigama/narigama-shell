@@ -54,9 +54,11 @@ Singleton {
     }
 
     function appScore(query, entry) {
-        const best = Math.max(fuzzy(query, entry.name), fuzzy(query, entry.genericName) - 50, entry.keywords.map((k) => {
-            return fuzzy(query, k) - 80;
-        }), fuzzy(query, entry.comment) - 200);
+        // Loop instead of spreading into Math.max(): qmlformat strips `...` from call arguments.
+        let best = Math.max(fuzzy(query, entry.name), fuzzy(query, entry.genericName) - 50, fuzzy(query, entry.comment) - 200);
+        for (const k of entry.keywords)
+            best = Math.max(best, fuzzy(query, k) - 80);
+
         return best < 0 ? -1 : best + 40 * Math.log2(1 + (launches[entry.id] ?? 0));
     }
 
