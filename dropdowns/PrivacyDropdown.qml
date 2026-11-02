@@ -15,7 +15,7 @@ ColumnLayout {
     }
 
     Repeater {
-        model: [["mic", "Microphone", Icons.microphone, Privacy.micApps], ["camera", "Camera", Icons.camera, Privacy.cameraApps], ["screen", "Screen sharing", Icons.screenShare, Privacy.screenApps]].filter(k => k[3].length > 0)
+        model: [["mic", "Microphone", Privacy.micMuted ? Icons.microphoneOff : Icons.microphone, Privacy.micApps], ["camera", "Camera", Icons.camera, Privacy.cameraApps], ["screen", "Screen sharing", Icons.screenShare, Privacy.screenApps]].filter(k => k[3].length > 0)
 
         delegate: ColumnLayout {
             id: group
@@ -36,7 +36,7 @@ ColumnLayout {
                     required property string modelData
 
                     icon: group.modelData[2]
-                    iconColor: Theme.red
+                    iconColor: group.modelData[0] === "mic" && Privacy.micMuted ? Theme.fgMuted : Theme.red
                     title: modelData
                     clickable: false
                 }

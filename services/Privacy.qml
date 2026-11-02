@@ -40,4 +40,16 @@ Singleton {
     readonly property var cameraApps: appsFor("camera")
     readonly property var screenApps: appsFor("screen")
     readonly property bool active: captures.length > 0
+
+    readonly property PwNode source: Pipewire.defaultAudioSource
+    readonly property bool micMuted: source?.audio?.muted ?? false
+
+    function toggleMic() {
+        if (source?.audio)
+            source.audio.muted = !source.audio.muted;
+    }
+
+    PwObjectTracker {
+        objects: [root.source]
+    }
 }
